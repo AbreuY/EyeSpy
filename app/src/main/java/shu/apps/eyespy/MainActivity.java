@@ -79,6 +79,18 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
+    public void onBackPressed() {
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+        if (count == 0) {
+            super.onBackPressed();
+            //additional code
+        } else {
+            getSupportFragmentManager().popBackStack();
+            signInSilently();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume()");
@@ -92,6 +104,7 @@ public class MainActivity extends FragmentActivity implements
     private void switchToFragment(Fragment newFragment) {
         getSupportFragmentManager()
                 .beginTransaction()
+                .addToBackStack(newFragment.getClass().getSimpleName())
                 .replace(R.id.fragment_container, newFragment)
                 .commit();
     }

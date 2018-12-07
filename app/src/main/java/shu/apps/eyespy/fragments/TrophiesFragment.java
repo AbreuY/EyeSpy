@@ -40,6 +40,7 @@ public class TrophiesFragment extends Fragment {
 
     private void updateUI() {
         mTrophiesGridView.setAdapter(mTrophies);
+
     }
 
     @Nullable
@@ -110,12 +111,12 @@ public class TrophiesFragment extends Fragment {
                     || achievement.getState() == Achievement.STATE_HIDDEN) {
                 imageView.setImageResource(R.drawable.trophy_shadow);
             } else {
-                imageView.setImageResource(R.drawable.trophy);
+                imageView.setImageURI(achievement.getUnlockedImageUri());
             }
             return imageView;
         }
 
-        public void setAchievements(List<Achievement> achievements) {
+        void setAchievements(List<Achievement> achievements) {
             mAchievements = achievements;
         }
 
