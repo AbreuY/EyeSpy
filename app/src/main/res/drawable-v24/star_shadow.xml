@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+        <item>
+        <layer-list>
+            <item>
+            <bitmap android:src="@drawable/star" android:tint="#AEA70D">
+            </bitmap>
+            </item>
+
+            <item android:bottom="16dp">
+                <bitmap android:src="@drawable/star"/>
+            </item>
+
+            </layer-list>
+        </item>
+    </selector>
