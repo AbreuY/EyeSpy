@@ -2,6 +2,7 @@ package shu.apps.eyespy;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,10 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.Objects;
 
+import shu.apps.eyespy.fragments.CameraFragment;
+import shu.apps.eyespy.fragments.MainMenuFragment;
+import shu.apps.eyespy.fragments.TrophiesFragment;
+
 //TODO: Rearrange the drawable folder to be more organised.
 
 public class MainActivity extends FragmentActivity implements
@@ -29,7 +34,11 @@ public class MainActivity extends FragmentActivity implements
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 9001;
+
     private MainMenuFragment mMainMenuFragment;
+    private CameraFragment mCameraFragment;
+    private TrophiesFragment mTrophiesFragment;
+
     private GoogleSignInClient mGoogleSignInClient;
     private PlayersClient mPlayersClient;
 
@@ -43,8 +52,16 @@ public class MainActivity extends FragmentActivity implements
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build());
 
         mMainMenuFragment = new MainMenuFragment();
+        mCameraFragment = new CameraFragment();
+        mTrophiesFragment = new TrophiesFragment();
 
         mMainMenuFragment.setListener(this);
+        mCameraFragment.setCallback(new CameraFragment.Callback() {
+            @Override
+            public void onImageTaken(Image image) {
+
+            }
+        });
 
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                 mMainMenuFragment).commit();
@@ -154,7 +171,7 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onStartGameRequested() {
-
+        switchToFragment(mCameraFragment);
     }
 
     @Override
@@ -165,6 +182,7 @@ public class MainActivity extends FragmentActivity implements
         }
 
         if (isSignedIn()) {
+            switchToFragment(mTrophiesFragment);
             // TODO: Show Achievements Fragment
         }
     }

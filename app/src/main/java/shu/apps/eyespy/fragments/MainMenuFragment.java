@@ -1,7 +1,8 @@
-package shu.apps.eyespy;
+package shu.apps.eyespy.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import shu.apps.eyespy.R;
 
 public class MainMenuFragment extends Fragment implements OnClickListener {
 
@@ -18,6 +21,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
 
     private TextView mUsernameTextView;
 
+    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
@@ -76,7 +80,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
         mUsernameTextView.setText(mUsername);
     }
 
-    interface Listener {
+    public interface Listener {
         void onProfilePageRequested();
 
         void onStartGameRequested();
