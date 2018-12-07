@@ -1,18 +1,3 @@
-/* Copyright (C) 2013 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package shu.apps.eyespy;
 
 import android.os.Bundle;
@@ -23,24 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class MainMenuFragment extends Fragment implements OnClickListener {
 
     private static final String TAG = MainMenuFragment.class.getSimpleName();
-
-    interface Listener {
-        void onProfilePageRequested();
-
-        void onStartGameRequested();
-
-        void onShowAchievementsRequested();
-
-        void onShowLeaderboardRequested();
-
-        void onShowSettingsRequested();
-    }
-
+    private String mUsername;
     private Listener mListener = null;
+
+    private TextView mUsernameTextView;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -61,7 +37,14 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
             view.findViewById(clickableId).setOnClickListener(this);
         }
 
+        mUsernameTextView = view.findViewById(R.id.main_menu_username_text_view);
+
         return view;
+    }
+
+    public void setUsername(String username) {
+        this.mUsername = username;
+        updateUI();
     }
 
     public void setListener(Listener listener) {
@@ -87,5 +70,21 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
             case R.id.main_menu_options_button:
                 mListener.onShowSettingsRequested();
         }
+    }
+
+    private void updateUI() {
+        mUsernameTextView.setText(mUsername);
+    }
+
+    interface Listener {
+        void onProfilePageRequested();
+
+        void onStartGameRequested();
+
+        void onShowAchievementsRequested();
+
+        void onShowLeaderboardRequested();
+
+        void onShowSettingsRequested();
     }
 }

@@ -11,21 +11,18 @@
         android:id="@+id/main_menu_profile_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="55dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="25dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="25dp"
         android:background="@drawable/curved_button_template"
         app:layout_constraintBottom_toTopOf="@+id/main_menu_play_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical">
 
 
-        <android.support.v7.widget.LinearLayoutCompat
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
             <android.support.v7.widget.LinearLayoutCompat
                 android:layout_width="fill_parent"
@@ -114,34 +111,34 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="horizontal"
-                android:paddingTop="10dp">
+                android:paddingTop="10dp"
+                android:paddingBottom="20dp"
+                >
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/main_menu_username_text_view"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_gravity="center_vertical"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="10dp"
+
                     android:text="HANNAH"
                     android:textAlignment="center"
                     android:textColor="#FFFF"
-                    android:textSize="40dp" />
+                    android:textSize="40sp" />
             </android.support.v7.widget.LinearLayoutCompat>
-        </android.support.v7.widget.LinearLayoutCompat>
     </LinearLayout>
 
     <Button
         android:id="@+id/main_menu_play_button"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="25dp"
         android:background="@drawable/curved_button_template"
         android:text="@string/main_menu_play_button"
         android:textColor="#FFFF"
-        android:textSize="40sp"
+        android:textSize="32sp"
         app:layout_constraintBottom_toTopOf="@id/main_menu_trophies_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -151,14 +148,13 @@
         android:id="@+id/main_menu_trophies_button"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_gravity=""
-        android:layout_marginStart="55dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="25dp"
         android:background="@drawable/curved_button_template"
         android:text="@string/main_menu_trophies_button"
         android:textColor="#FFFF"
-        android:textSize="40sp"
+        android:textSize="32sp"
         app:layout_constraintBottom_toTopOf="@+id/main_menu_rankings_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -168,13 +164,13 @@
         android:id="@+id/main_menu_rankings_button"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="25dp"
         android:background="@drawable/curved_button_template"
         android:text="@string/main_menu_rankings_button"
         android:textColor="#FFFF"
-        android:textSize="40sp"
+        android:textSize="32sp"
         app:layout_constraintBottom_toTopOf="@id/main_menu_options_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -184,13 +180,13 @@
         android:id="@+id/main_menu_options_button"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="25dp"
         android:background="@drawable/curved_button_template"
         android:text="@string/main_menu_options_button"
         android:textColor="#FFFF"
-        android:textSize="40sp"
+        android:textSize="32sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
