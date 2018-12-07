@@ -15,12 +15,20 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.games.AchievementsClient;
+import com.google.android.gms.games.AnnotatedData;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayersClient;
+import com.google.android.gms.games.achievement.Achievement;
+import com.google.android.gms.games.achievement.AchievementBuffer;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import shu.apps.eyespy.fragments.CameraFragment;
@@ -34,6 +42,7 @@ public class MainActivity extends FragmentActivity implements
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 9001;
+    private static final int REQUEST_CODE_UNUSED = 9002;
 
     private MainMenuFragment mMainMenuFragment;
     private CameraFragment mCameraFragment;
@@ -41,6 +50,8 @@ public class MainActivity extends FragmentActivity implements
 
     private GoogleSignInClient mGoogleSignInClient;
     private PlayersClient mPlayersClient;
+    private AchievementsClient mAchievementsClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +155,7 @@ public class MainActivity extends FragmentActivity implements
 
         //TODO: Should we store the player as a class? This may allow for anonymous users?
         mPlayersClient = Games.getPlayersClient(this, account);
+        mAchievementsClient = Games.getAchievementsClient(this, account);
 
         mPlayersClient.getCurrentPlayer()
                 .addOnCompleteListener(new OnCompleteListener<Player>() {
@@ -156,7 +168,26 @@ public class MainActivity extends FragmentActivity implements
                         }
                     }
                 });
+
+        mAchievementsClient.load(false)
+                .addOnCompleteListener(new OnCompleteListener<AnnotatedData<AchievementBuffer>>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AnnotatedData<AchievementBuffer>> task) {
+                        if (task.isSuccessful()) {
+                            AchievementBuffer achievementsBuffer = task.getResult().get();
+                            if (achievementsBuffer != null) {
+                                Log.d(TAG, Integer.toString(achievementsBuffer.getCount()));
+                                List<Achievement> achievements = new ArrayList<>();
+                                for (int i = 0; i < achievementsBuffer.getCount(); i++) {
+                                    achievements.add(achievementsBuffer.get(i));
+                                }
+                                mTrophiesFragment.setAchievements(achievements);
+                            }
+                        }
+                    }
+                });
     }
+
 
     private void onDisconnected() {
         Log.d(TAG, "onDisconnected()");
@@ -182,8 +213,23 @@ public class MainActivity extends FragmentActivity implements
         }
 
         if (isSignedIn()) {
-            switchToFragment(mTrophiesFragment);
+            //TODO: Change this to use custom UI.
+            /* mAchievementsClient.getAchievementsIntent()
+                    .addOnSuccessListener(new OnSuccessListener<Intent>() {
+                        @Override
+                        public void onSuccess(Intent intent) {
+                            startActivityForResult(intent, REQUEST_CODE_UNUSED);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //handleException(e, getString(R.string.achievements_exception));
+                        }
+                    });
+                    */
             // TODO: Show Achievements Fragment
+            switchToFragment(mTrophiesFragment);
         }
     }
 
