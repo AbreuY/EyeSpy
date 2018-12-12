@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -68,9 +69,11 @@ public class MainActivity extends FragmentActivity implements
 
         mMainMenuFragment.setListener(this);
         mCameraFragment.setCallback(new CameraFragment.Callback() {
+            //Callback is called when the camera has taken the picture and stored it in the file.
             @Override
-            public void onImageTaken(Image image) {
-
+            public void onImageTaken(File file) {
+                //TODO: Use this area for the API calls.
+                Log.d(TAG, file.toString());
             }
         });
 
