@@ -26,6 +26,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.api.client.extensions.android.json.AndroidJsonFactory;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.services.vision.v1.Vision;
+import com.google.api.services.vision.v1.VisionRequestInitializer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -73,6 +77,17 @@ public class MainActivity extends FragmentActivity implements
             @Override
             public void onImageTaken(File file) {
                 //TODO: Use this area for the API calls.
+
+                Vision.Builder visionBuilder = new Vision.Builder(
+                        new NetHttpTransport(),
+                        new AndroidJsonFactory(),
+                        null);
+
+                visionBuilder.setVisionRequestInitializer(
+                        new VisionRequestInitializer("AIzaSyDUojPDdBgIJv_b9r1tQPHFpk2IBo7fR64"));
+
+                Vision vision = visionBuilder.build();
+
                 Log.d(TAG, file.toString());
             }
         });
