@@ -24,20 +24,65 @@
         android:fitsSystemWindows="true">
 
         <RelativeLayout
+            android:id="@+id/show_selected_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+
+            <android.support.v7.widget.LinearLayoutCompat
+                android:id="@+id/backToLevelSelection"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/header_button_template"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingRight="20dp"
+                    android:paddingLeft="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:text="CHAIR"
+                    android:textAlignment="center"
+                    android:textColor="#FFFF"
+                    android:textSize="40sp" />
+
+                <ImageView
+                    android:id="@+id/img2"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_horizontal"
+                    android:src="@drawable/star_shadow"
+                    android:textAlignment="center"
+                    android:contentDescription="This is a star to show the difficulty chosen."/>
+            </android.support.v7.widget.LinearLayoutCompat>
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/fullscreen_content_controls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:orientation="horizontal"
+            android:scaleX="0.4"
+            android:scaleY="0.4"
             tools:ignore="UselessParent">
 
-            <Button
+            <ImageView
                 android:id="@+id/takePicture"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@drawable/circle_button"
-                />
+                android:layout_width="300dp"
+                android:layout_height="150dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/curved_button_template"
+                android:padding="20dp"
+                android:src="@drawable/camera"
+                android:contentDescription="This is a button of a camera to take photos with."/>
 
         </RelativeLayout>
     </FrameLayout>
