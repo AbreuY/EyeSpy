@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
@@ -13,8 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:keepScreenOn="true"
-        />
+        android:keepScreenOn="true" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
@@ -23,68 +21,69 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <RelativeLayout
+
+        <!--TODO: We will have issues with long text + high difficulty views, any way round this?-->
+        <LinearLayout
             android:id="@+id/show_selected_level"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
             android:layout_gravity="top|center_horizontal"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent">
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="40dp"
+            android:background="@drawable/header_button_template"
+            android:orientation="horizontal">
 
-            <android.support.v7.widget.LinearLayoutCompat
-                android:id="@+id/backToLevelSelection"
-                android:layout_width="fill_parent"
+            <TextView
+                android:id="@+id/camera_item_text_view"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/header_button_template"
-                android:orientation="horizontal"
-                android:padding="10dp">
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="20dp"
+                android:textColor="#FFFF"
+                android:textSize="40sp" />
 
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingRight="20dp"
-                    android:paddingLeft="30dp"
-                    android:layout_gravity="center_vertical"
-                    android:text="CHAIR"
-                    android:textAlignment="center"
-                    android:textColor="#FFFF"
-                    android:textSize="40sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:gravity="end|center_vertical"
+                android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/img2"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@drawable/star_shadow"
-                    android:textAlignment="center"
-                    android:contentDescription="This is a star to show the difficulty chosen."/>
-            </android.support.v7.widget.LinearLayoutCompat>
+                    android:layout_marginStart="20dp"
+                    android:contentDescription="This is a star to show the difficulty chosen."
+                    android:src="@drawable/star_shadow" />
 
-        </RelativeLayout>
+            </LinearLayout>
 
-        <RelativeLayout
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/fullscreen_content_controls"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="160dp"
+            android:layout_height="80dp"
             android:layout_gravity="bottom|center_horizontal"
-            android:orientation="horizontal"
-            android:scaleX="0.4"
-            android:scaleY="0.4"
-            tools:ignore="UselessParent">
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/curved_button_template">
 
-            <ImageView
-                android:id="@+id/takePicture"
-                android:layout_width="300dp"
-                android:layout_height="150dp"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/curved_button_template"
-                android:padding="20dp"
-                android:src="@drawable/camera"
-                android:contentDescription="This is a button of a camera to take photos with."/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal">
 
-        </RelativeLayout>
+                <ImageView
+                    android:id="@+id/takePicture"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="This is a button of a camera to take photos with."
+                    android:src="@drawable/camera" />
+            </LinearLayout>
+        </LinearLayout>
     </FrameLayout>
 
 </FrameLayout>
