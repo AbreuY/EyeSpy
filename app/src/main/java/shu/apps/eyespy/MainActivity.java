@@ -107,7 +107,7 @@ public class MainActivity extends FragmentActivity implements
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack(newFragment.getClass().getSimpleName())
-                .replace(R.id.fragment_container, newFragment)
+                .add(R.id.fragment_container, newFragment)
                 .commit();
     }
 
