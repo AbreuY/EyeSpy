@@ -23,8 +23,6 @@ import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.android.gms.games.achievement.AchievementBuffer;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
@@ -32,19 +30,22 @@ import java.util.List;
 import java.util.Objects;
 
 import shu.apps.eyespy.fragments.CameraFragment;
+import shu.apps.eyespy.fragments.ItemSelectFragment;
 import shu.apps.eyespy.fragments.MainMenuFragment;
 import shu.apps.eyespy.fragments.TrophiesFragment;
 
 //TODO: Rearrange the drawable folder to be more organised.
 
 public class MainActivity extends FragmentActivity implements
-        MainMenuFragment.Listener {
+        MainMenuFragment.Listener,
+        ItemSelectFragment.ItemSelectedCallback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 9001;
     private static final int REQUEST_CODE_UNUSED = 9002;
 
     private MainMenuFragment mMainMenuFragment;
+    private ItemSelectFragment mItemSelectFragment;
     private CameraFragment mCameraFragment;
     private TrophiesFragment mTrophiesFragment;
 
@@ -65,6 +66,7 @@ public class MainActivity extends FragmentActivity implements
         mMainMenuFragment = new MainMenuFragment();
         mCameraFragment = new CameraFragment();
         mTrophiesFragment = new TrophiesFragment();
+        mItemSelectFragment = new ItemSelectFragment();
 
         mMainMenuFragment.setListener(this);
         mCameraFragment.setCallback(new CameraFragment.Callback() {
@@ -73,6 +75,7 @@ public class MainActivity extends FragmentActivity implements
 
             }
         });
+        mItemSelectFragment.setSelectedItemCallback(this);
 
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
                 mMainMenuFragment).commit();
@@ -86,7 +89,6 @@ public class MainActivity extends FragmentActivity implements
             //additional code
         } else {
             getSupportFragmentManager().popBackStack();
-            signInSilently();
         }
     }
 
@@ -105,7 +107,7 @@ public class MainActivity extends FragmentActivity implements
         getSupportFragmentManager()
                 .beginTransaction()
                 .addToBackStack(newFragment.getClass().getSimpleName())
-                .replace(R.id.fragment_container, newFragment)
+                .add(R.id.fragment_container, newFragment)
                 .commit();
     }
 
@@ -215,7 +217,9 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onStartGameRequested() {
-        switchToFragment(mCameraFragment);
+        //TODO: Pull which of the 3 items we want the user to be able to choose from.
+
+        switchToFragment(mItemSelectFragment);
     }
 
     @Override
@@ -263,4 +267,9 @@ public class MainActivity extends FragmentActivity implements
 
     }
 
+    @Override
+    public void onItemSelected(Item selectedItem) {
+        mCameraFragment.setSelectedItem(selectedItem);
+        switchToFragment(mCameraFragment);
+    }
 }

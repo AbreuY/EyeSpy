@@ -57,6 +57,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -68,12 +69,16 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import shu.apps.eyespy.Item;
 import shu.apps.eyespy.R;
 import shu.apps.eyespy.utilities.AutoFitTextureView;
 import shu.apps.eyespy.utilities.ImageSaver;
 
 public class CameraFragment extends Fragment
         implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private TextView itemTextView;
+    private View mView;
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -92,6 +97,21 @@ public class CameraFragment extends Fragment
     //TODO: Change this to behave like a callback
     public interface Callback {
         void onImageTaken(Image image);
+    }
+
+    private Item selectedItem;
+
+    public void setSelectedItem(Item selectedItem) {
+        this.selectedItem = selectedItem;
+        updateUI();
+    }
+
+    private void updateUI() {
+        if (mView == null) {
+            return;
+        }
+
+        itemTextView.setText(selectedItem.getName());
     }
 
     private Callback mCallback = null;
@@ -414,20 +434,19 @@ public class CameraFragment extends Fragment
         }
     }
 
-    public static CameraFragment newInstance() {
-        return new CameraFragment();
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_camera, container, false);
-    }
+        mView =inflater.inflate(R.layout.fragment_camera, container, false);
 
-    @Override
-    public void onViewCreated(final View view, Bundle savedInstanceState) {
-        view.findViewById(R.id.takePicture).setOnClickListener(this);
-        mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
+        itemTextView = mView.findViewById(R.id.camera_item_text_view);
+        mTextureView = mView.findViewById(R.id.texture);
+
+        mView.findViewById(R.id.takePicture).setOnClickListener(this);
+
+        updateUI();
+
+        return mView;
     }
 
     @Override
