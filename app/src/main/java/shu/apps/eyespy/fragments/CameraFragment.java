@@ -96,7 +96,7 @@ public class CameraFragment extends Fragment
 
     //TODO: Change this to behave like a callback
     public interface Callback {
-        void onImageTaken(File file); // Callback for when the Image has been taken.
+        void onImageTaken(Image image);
     }
 
     private Item selectedItem;
@@ -850,9 +850,10 @@ public class CameraFragment extends Fragment
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    unlockFocus();
                     showToast("Saved: " + mFile);
-                    mCallback.onImageTaken(mFile); // Callback is set at L71 - MainActivity
+
+                    Log.d(TAG, mFile.toString());
+                    unlockFocus();
                 }
             };
 
