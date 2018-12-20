@@ -17,6 +17,7 @@ import shu.apps.eyespy.R;
 public class MainMenuFragment extends Fragment implements OnClickListener {
 
     private static final String TAG = MainMenuFragment.class.getSimpleName();
+    private View mView;
     private String mUsername;
     private Listener mListener = null;
 
@@ -28,7 +29,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
                              ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_main_menu, container, false);
+        mView = inflater.inflate(R.layout.fragment_main_menu, container, false);
 
         final int[] clickableIds = new int[]{
                 R.id.main_menu_profile_button,
@@ -39,12 +40,13 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
         };
 
         for (int clickableId : clickableIds) {
-            view.findViewById(clickableId).setOnClickListener(this);
+            mView.findViewById(clickableId).setOnClickListener(this);
         }
 
-        mUsernameTextView = view.findViewById(R.id.main_menu_username_text_view);
+        mUsernameTextView = mView.findViewById(R.id.main_menu_username_text_view);
+        updateUI();
 
-        return view;
+        return mView;
     }
 
     public void setUsername(String username) {
@@ -78,6 +80,10 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
     }
 
     private void updateUI() {
+        if (mView == null) {
+            return;
+        }
+
         mUsernameTextView.setText(mUsername);
     }
 

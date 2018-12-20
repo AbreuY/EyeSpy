@@ -77,7 +77,7 @@ import shu.apps.eyespy.utilities.ImageSaver;
 public class CameraFragment extends Fragment
         implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private TextView itemTextView;
+    private TextView mItemTextView;
     private View mView;
 
     /**
@@ -111,7 +111,7 @@ public class CameraFragment extends Fragment
             return;
         }
 
-        itemTextView.setText(selectedItem.getName());
+        mItemTextView.setText(selectedItem.getName());
     }
 
     private Callback mCallback = null;
@@ -437,9 +437,9 @@ public class CameraFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mView =inflater.inflate(R.layout.fragment_camera, container, false);
+        mView = inflater.inflate(R.layout.fragment_camera, container, false);
 
-        itemTextView = mView.findViewById(R.id.camera_item_text_view);
+        mItemTextView = mView.findViewById(R.id.camera_item_text_view);
         mTextureView = mView.findViewById(R.id.texture);
 
         mView.findViewById(R.id.takePicture).setOnClickListener(this);

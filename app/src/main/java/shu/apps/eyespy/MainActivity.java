@@ -2,12 +2,13 @@ package shu.apps.eyespy;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -69,16 +70,11 @@ public class MainActivity extends FragmentActivity implements
         mItemSelectFragment = new ItemSelectFragment();
 
         mMainMenuFragment.setListener(this);
-        mCameraFragment.setCallback(new CameraFragment.Callback() {
-            @Override
-            public void onImageTaken(Image image) {
-
-            }
-        });
         mItemSelectFragment.setSelectedItemCallback(this);
 
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
-                mMainMenuFragment).commit();
+        setFragmentToContainer(mMainMenuFragment);
+        //getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
+        //        mMainMenuFragment).commit();
     }
 
     @Override
@@ -100,15 +96,6 @@ public class MainActivity extends FragmentActivity implements
         // State of signed in user could change when changing from another app,
         // try and sign in again when the app resumes.
         signInSilently();
-    }
-
-    // Switch UI to the given fragment.
-    private void switchToFragment(Fragment newFragment) {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .addToBackStack(newFragment.getClass().getSimpleName())
-                .add(R.id.fragment_container, newFragment)
-                .commit();
     }
 
     // Returns whether the user is currently signed into a Google account.
@@ -219,7 +206,7 @@ public class MainActivity extends FragmentActivity implements
     public void onStartGameRequested() {
         //TODO: Pull which of the 3 items we want the user to be able to choose from.
 
-        switchToFragment(mItemSelectFragment);
+        setFragmentToContainer(mItemSelectFragment);
     }
 
     @Override
@@ -246,7 +233,7 @@ public class MainActivity extends FragmentActivity implements
                     });
                     */
             // TODO: Show Achievements Fragment
-            switchToFragment(mTrophiesFragment);
+            setFragmentToContainer(mTrophiesFragment);
         }
     }
 
@@ -270,6 +257,37 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onItemSelected(Item selectedItem) {
         mCameraFragment.setSelectedItem(selectedItem);
-        switchToFragment(mCameraFragment);
+        setFragmentToContainer(mCameraFragment);
+    }
+
+    public void setFragmentToContainer(Fragment fragment)
+    {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        final String fragmentTag  = fragment.getClass().getSimpleName();
+
+        if (isFragmentInBackstack(fragmentManager,fragmentTag)) {
+            // Fragment exists, go back to that fragment
+            //// you can also use POP_BACK_STACK_INCLUSIVE flag, depending on flow
+            fragmentManager.popBackStackImmediate(fragmentTag, 0);
+        } else {
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.fragment_container, fragment);
+            if (fragment instanceof MainMenuFragment) {
+                //Exit app on back press
+            } else {
+                transaction.addToBackStack(fragmentTag);
+            }
+            transaction.commit();
+        }
+
+    }
+
+    public static boolean isFragmentInBackstack(final FragmentManager fragmentManager, final String fragmentTagName) {
+        for (int entry = 0; entry < fragmentManager.getBackStackEntryCount(); entry++) {
+            if (fragmentTagName.equals(fragmentManager.getBackStackEntryAt(entry).getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
