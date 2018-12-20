@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/achievement_toast_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="bottom|center_horizontal"
+    android:background="@drawable/curved_button_template"
+    >
+    
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="20dp"
+        android:src="@drawable/trophy_shadow"/>
+
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:orientation="vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp"
+        >
+
+        <TextView
+            android:id="@+id/achievement_toast_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:layout_gravity="center_vertical"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:text="Test Achievement"
+            />
+
+        <TextView
+            android:id="@+id/achievement_toast_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="4dp"
+
+            android:maxLines="2"
+            android:text="This is a achievement description. This is a test of going over a line."
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

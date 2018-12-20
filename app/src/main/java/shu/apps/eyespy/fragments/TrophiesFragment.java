@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +13,20 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.games.achievement.Achievement;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import shu.apps.eyespy.R;
 
-public class TrophiesFragment extends Fragment {
+public class TrophiesFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = TrophiesFragment.class.getSimpleName();
+    private View mView;
     private GridView mTrophiesGridView;
     private Trophies mTrophies;
 
@@ -33,37 +37,48 @@ public class TrophiesFragment extends Fragment {
     public void setAchievements(List<Achievement> achievements) {
         this.mTrophies.setAchievements(achievements);
 
-        if (mTrophiesGridView != null) {
-            updateUI();
-        }
+        updateUI();
     }
 
     private void updateUI() {
-        mTrophiesGridView.setAdapter(mTrophies);
+        if (mView == null)
+            return;
 
+        mTrophiesGridView.setAdapter(mTrophies);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_trophies, container, false);
+        mView = inflater.inflate(R.layout.fragment_trophies, container, false);
 
         mTrophies.setContext(getActivity());
 
-        mTrophiesGridView = view.findViewById(R.id.trophies_grid_view);
+        mTrophiesGridView = mView.findViewById(R.id.trophies_grid_view);
         mTrophiesGridView.setVerticalScrollBarEnabled(false);
-        updateUI();
 
         //TODO: Create a listener to handle the button click in main activity.
-        mTrophiesGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Toast.makeText(getActivity(), mTrophies.getAchievement(position).getDescription(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
+        mTrophiesGridView.setOnItemClickListener(this);
 
-        return view;
+        updateUI();
+        return mView;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.achievement_toast, (ViewGroup) view.findViewById(R.id.achievement_toast_root));
+
+        TextView achievementTitleTextView = layout.findViewById(R.id.achievement_toast_title);
+        achievementTitleTextView.setText(mTrophies.getAchievement(position).getName());
+        TextView achievementDescriptionTextView = layout.findViewById(R.id.achievement_toast_description);
+        achievementDescriptionTextView.setText(mTrophies.getAchievement(position).getDescription());
+
+        Toast toast = new Toast(getContext());
+        toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, 80);
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.show();
     }
 
     class Trophies extends BaseAdapter {
@@ -74,6 +89,10 @@ public class TrophiesFragment extends Fragment {
 
         private Context mContext;
         private List<Achievement> mAchievements;
+
+        public Trophies() {
+            mAchievements = new ArrayList<>();
+        }
 
         void setContext(Context context) {
             this.mContext = context;
