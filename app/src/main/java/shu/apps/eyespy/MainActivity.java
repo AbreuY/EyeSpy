@@ -1,6 +1,7 @@
 package shu.apps.eyespy;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -57,6 +59,7 @@ import java.util.Objects;
 import shu.apps.eyespy.fragments.CameraFragment;
 import shu.apps.eyespy.fragments.ItemSelectFragment;
 import shu.apps.eyespy.fragments.MainMenuFragment;
+import shu.apps.eyespy.fragments.SplashScreenFragment;
 import shu.apps.eyespy.fragments.TrophiesFragment;
 import shu.apps.eyespy.utilities.PackageManagerUtils;
 
@@ -77,6 +80,7 @@ public class MainActivity extends FragmentActivity implements
     private static final int REQUEST_CODE_SIGN_IN = 9001;
     private static final int REQUEST_CODE_UNUSED = 9002;
 
+    private SplashScreenFragment mSplashScreenFragment;
     private MainMenuFragment mMainMenuFragment;
     private ItemSelectFragment mItemSelectFragment;
     private CameraFragment mCameraFragment;
@@ -118,7 +122,7 @@ public class MainActivity extends FragmentActivity implements
                 new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
 
-
+        mSplashScreenFragment = new SplashScreenFragment();
         mMainMenuFragment = new MainMenuFragment();
         mCameraFragment = new CameraFragment();
         mTrophiesFragment = new TrophiesFragment();
@@ -128,9 +132,9 @@ public class MainActivity extends FragmentActivity implements
         mItemSelectFragment.setSelectedItemCallback(this);
         mCameraFragment.setCallback(this);
 
-        setFragmentToContainer(mMainMenuFragment);
+        setFragmentToContainer(mSplashScreenFragment);
         //getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
-        //        mMainMenuFragment).commit();
+        //        mSplashScreenFragment).commit();
     }
 
     @Override
@@ -170,8 +174,23 @@ public class MainActivity extends FragmentActivity implements
                             onConnected(task.getResult());
                         } else {
                             final ApiException exception = (ApiException) task.getException();
+                            mSplashScreenFragment.setStatus("Failed to sign in...", View.GONE);
                             if (exception.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
-                                startSignInIntent();
+                                new AlertDialog.Builder(MainActivity.this)
+                                        .setMessage(R.string.sign_in_other_error)
+                                        .setNeutralButton("Retry", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                startSignInIntent();
+                                            }
+                                        })
+                                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                            @Override
+                                            public void onDismiss(DialogInterface dialog) {
+                                                startSignInIntent();
+                                            }
+                                        })
+                                        .show();
                             }
                         }
                     }
@@ -179,6 +198,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void startSignInIntent() {
+        mSplashScreenFragment.setStatus("Attempting to sign in...", View.VISIBLE);
         startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
     }
 
@@ -194,17 +214,7 @@ public class MainActivity extends FragmentActivity implements
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 onConnected(account);
             } catch (ApiException e) {
-                String message = e.getMessage();
-                if (message == null || message.isEmpty()) {
-                    message = getString(R.string.sign_in_other_error);
-                }
-
                 onDisconnected();
-
-                new AlertDialog.Builder(this)
-                        .setMessage(message)
-                        .setNeutralButton(android.R.string.ok, null)
-                        .show();
             }
         }
     }
@@ -212,9 +222,10 @@ public class MainActivity extends FragmentActivity implements
     private void onConnected(GoogleSignInAccount account) {
         Log.d(TAG, "onConnected(): Connected to Google APIs.");
 
-        //TODO: Should we store the player as a class? This may allow for anonymous users?
         mPlayersClient = Games.getPlayersClient(this, account);
         mAchievementsClient = Games.getAchievementsClient(this, account);
+
+        mSplashScreenFragment.setStatus("Retrieving player information...", View.VISIBLE);
 
         mPlayersClient.getCurrentPlayer()
                 .addOnCompleteListener(new OnCompleteListener<Player>() {
@@ -222,8 +233,8 @@ public class MainActivity extends FragmentActivity implements
                     public void onComplete(@NonNull Task<Player> task) {
                         if (task.isSuccessful()) {
                             final String username = Objects.requireNonNull(task.getResult()).getDisplayName();
-                            Log.d(TAG, "onConnected(): Username - " + username);
                             mMainMenuFragment.setUsername(username);
+                            Log.d(TAG, "onConnected(): Username - " + username);
                         }
                     }
                 });
@@ -242,6 +253,7 @@ public class MainActivity extends FragmentActivity implements
                                 }
                                 mTrophiesFragment.setAchievements(achievements);
                             }
+                            setFragmentToContainer(mMainMenuFragment);
                         }
                     }
                 });
@@ -251,6 +263,7 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "onDisconnected()");
 
         mPlayersClient = null;
+        mAchievementsClient = null;
     }
 
     @Override

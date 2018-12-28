@@ -8,7 +8,7 @@
     <string name="main_menu_trophies_button">TROPHIES</string> <!-- TODO: change this to a better name, as used in more than one place. -->
     <string name="main_menu_play_button">PLAY</string>
 
-    <string name="sign_in_other_error">There was an issue with sign in.  Please try again later.</string>
+    <string name="sign_in_other_error">There was an issue with sign in.  Please try again.</string>
 
     <string name="request_camera_permission">This sample needs camera permission.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>

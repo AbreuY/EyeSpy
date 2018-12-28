@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import shu.apps.eyespy.R;
 
-//TODO: Look into whether we should actually extend Fragment or FragmentActivity.
 public class MainMenuFragment extends Fragment implements OnClickListener {
 
     private static final String TAG = MainMenuFragment.class.getSimpleName();
@@ -28,7 +27,6 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-
         mView = inflater.inflate(R.layout.fragment_main_menu, container, false);
 
         final int[] clickableIds = new int[]{

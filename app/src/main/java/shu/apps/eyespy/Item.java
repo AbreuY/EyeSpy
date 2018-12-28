@@ -1,6 +1,8 @@
 package shu.apps.eyespy;
 
 public class Item {
+
+    private String id;
     private String name;
     private ItemDifficulty difficulty;
 
@@ -10,8 +12,11 @@ public class Item {
     }
 
     public String getName() {
-
         return name;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public ItemDifficulty getDifficulty() {
