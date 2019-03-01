@@ -1,4 +1,4 @@
-package shu.apps.eyespy;
+package shu.eyespy;
 
 public class Item {
 

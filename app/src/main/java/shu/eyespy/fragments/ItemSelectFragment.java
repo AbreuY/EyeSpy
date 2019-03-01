@@ -1,4 +1,4 @@
-package shu.apps.eyespy.fragments;
+package shu.eyespy.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,8 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import shu.apps.eyespy.Item;
-import shu.apps.eyespy.R;
+import shu.eyespy.Item;
+import shu.eyespy.R;
+
 
 public class ItemSelectFragment extends Fragment implements View.OnClickListener {
 

@@ -1,4 +1,4 @@
-package shu.apps.eyespy.utilities;
+package shu.eyespy.utilities;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;

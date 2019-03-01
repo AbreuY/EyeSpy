@@ -16,7 +16,7 @@ android {
 
     compileSdkVersion 28
     defaultConfig {
-        applicationId "shu.apps.eyespy"
+        applicationId "shu.eyespy"
         minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
@@ -25,7 +25,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -46,4 +46,5 @@ dependencies {
     implementation 'com.google.api-client:google-api-client-android:1.23.0' exclude module: 'httpclient'
     implementation 'com.google.http-client:google-http-client-gson:1.23.0' exclude module: 'httpclient'
     implementation 'com.google.apis:google-api-services-vision:v1-rev369-1.23.0'
+
 }

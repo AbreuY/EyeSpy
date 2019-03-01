@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package shu.apps.eyespy.fragments;
+package shu.eyespy.fragments;
 
 import android.Manifest;
 import android.app.Activity;
@@ -39,7 +39,6 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
@@ -69,10 +68,10 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import shu.apps.eyespy.Item;
-import shu.apps.eyespy.R;
-import shu.apps.eyespy.utilities.AutoFitTextureView;
-import shu.apps.eyespy.utilities.ImageSaver;
+import shu.eyespy.Item;
+import shu.eyespy.R;
+import shu.eyespy.utilities.AutoFitTextureView;
+import shu.eyespy.utilities.ImageSaver;
 
 public class CameraFragment extends Fragment
         implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
@@ -197,7 +196,7 @@ public class CameraFragment extends Fragment
     private CameraDevice mCameraDevice;
 
     /**
-     * The {@link android.util.Size} of camera preview.
+     * The {@link Size} of camera preview.
      */
     private Size mPreviewSize;
 
@@ -745,7 +744,7 @@ public class CameraFragment extends Fragment
     }
 
     /**
-     * Configures the necessary {@link android.graphics.Matrix} transformation to `mTextureView`.
+     * Configures the necessary {@link Matrix} transformation to `mTextureView`.
      * This method should be called after the camera preview size is determined in
      * setUpCameraOutputs and also the size of `mTextureView` is fixed.
      *

@@ -1,4 +1,4 @@
-package shu.apps.eyespy.utilities;
+package shu.eyespy.utilities;
 
 import android.media.Image;
 

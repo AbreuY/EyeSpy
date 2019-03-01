@@ -1,4 +1,4 @@
-package shu.apps.eyespy.fragments;
+package shu.eyespy.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +11,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import shu.apps.eyespy.R;
+import shu.eyespy.R;
+
 
 public class SplashScreenFragment extends Fragment {
 

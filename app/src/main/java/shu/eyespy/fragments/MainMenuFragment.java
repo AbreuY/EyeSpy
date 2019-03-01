@@ -1,4 +1,4 @@
-package shu.apps.eyespy.fragments;
+package shu.eyespy.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,7 +11,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import shu.apps.eyespy.R;
+import shu.eyespy.R;
 
 public class MainMenuFragment extends Fragment implements OnClickListener {
 

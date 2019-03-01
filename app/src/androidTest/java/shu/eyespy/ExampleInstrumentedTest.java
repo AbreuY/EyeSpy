@@ -1,4 +1,4 @@
-package shu.apps.eyespy;
+package shu.eyespy;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

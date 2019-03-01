@@ -1,4 +1,4 @@
-package shu.apps.eyespy.fragments;
+package shu.eyespy.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -21,7 +21,8 @@ import com.google.android.gms.games.achievement.Achievement;
 import java.util.ArrayList;
 import java.util.List;
 
-import shu.apps.eyespy.R;
+import shu.eyespy.R;
+
 
 public class TrophiesFragment extends Fragment implements AdapterView.OnItemClickListener {
 

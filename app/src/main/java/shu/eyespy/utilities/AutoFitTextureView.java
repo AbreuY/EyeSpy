@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package shu.apps.eyespy.utilities;
+package shu.eyespy.utilities;
 
 import android.content.Context;
 import android.util.AttributeSet;

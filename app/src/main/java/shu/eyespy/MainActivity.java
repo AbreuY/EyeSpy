@@ -1,4 +1,4 @@
-package shu.apps.eyespy;
+package shu.eyespy;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -6,12 +6,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Debug;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -55,13 +56,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 
-import shu.apps.eyespy.fragments.CameraFragment;
-import shu.apps.eyespy.fragments.ItemSelectFragment;
-import shu.apps.eyespy.fragments.MainMenuFragment;
-import shu.apps.eyespy.fragments.SplashScreenFragment;
-import shu.apps.eyespy.fragments.TrophiesFragment;
-import shu.apps.eyespy.utilities.PackageManagerUtils;
+import shu.eyespy.fragments.CameraFragment;
+import shu.eyespy.fragments.ItemSelectFragment;
+import shu.eyespy.fragments.MainMenuFragment;
+import shu.eyespy.fragments.SplashScreenFragment;
+import shu.eyespy.fragments.TrophiesFragment;
+import shu.eyespy.utilities.PackageManagerUtils;
 
 //TODO: Rearrange the drawable folder to be more organised.
 
@@ -70,7 +72,7 @@ public class MainActivity extends FragmentActivity implements
         ItemSelectFragment.ItemSelectedCallback,
         CameraFragment.Callback {
 
-    private static final String CLOUD_VISION_API_KEY = "AIzaSyDUojPDdBgIJv_b9r1tQPHFpk2IBo7fR64";
+    private static final String CLOUD_VISION_API_KEY = "AIzaSyD1-hvw0TcwQnfN0rXYHCEQWtruyl6Lmfo";
     private static final int MAX_DIMENSION = 1200;
     private static final String ANDROID_CERT_HEADER = "X-Android-Cert";
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";
@@ -90,6 +92,8 @@ public class MainActivity extends FragmentActivity implements
     private PlayersClient mPlayersClient;
     private AchievementsClient mAchievementsClient;
 
+    private static String chosenWord;
+
     public static boolean isFragmentInBackstack(final FragmentManager fragmentManager, final String fragmentTagName) {
         for (int entry = 0; entry < fragmentManager.getBackStackEntryCount(); entry++) {
             if (fragmentTagName.equals(fragmentManager.getBackStackEntryAt(entry).getName())) {
@@ -97,6 +101,22 @@ public class MainActivity extends FragmentActivity implements
             }
         }
         return false;
+    }
+
+    private static void generateWord()
+    {
+        Random randomGenerator  = new Random();
+        ArrayList<String> words = new ArrayList<>( );
+        words.add("Pen");
+        words.add("Keyboard");
+        words.add("Mouse");
+        words.add("Chair");
+        words.add("Book");
+        int index = randomGenerator.nextInt(words.size());
+        StringBuilder message = new StringBuilder();
+        chosenWord = words.get(index);
+        message.append(String.format("Please find the object: %s", chosenWord));
+
     }
 
     private static String convertResponseToString(BatchAnnotateImagesResponse response) {
@@ -107,6 +127,16 @@ public class MainActivity extends FragmentActivity implements
                 message.append(String.format(Locale.US, "%.3f: %s", label.getScore(), label.getDescription()));
                 message.append("\n");
             }
+            /*for (EntityAnnotation label : labels) {
+              if(label.getDescription().compareToIgnoreCase(chosenWord) == 0 && label.getScore() >= 0.8)
+              {
+                    message.append("Object Found");
+              }
+              else
+              {
+                  message.append("Incorrect Object");
+              }
+            }*/
         } else {
             message.append("Nothing found.");
         }
@@ -429,6 +459,7 @@ public class MainActivity extends FragmentActivity implements
         // TODO:: Make some sort of loading text.
         // Do the real work in an async task, because we need to use the network anyway
         try {
+            Log.d(TAG,"callCloudVision");
             AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(this, prepareAnnotationRequest(bitmap));
             labelDetectionTask.execute();
         } catch (IOException e) {
