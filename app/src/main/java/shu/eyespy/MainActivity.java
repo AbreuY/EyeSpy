@@ -1,13 +1,10 @@
 package shu.eyespy;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Debug;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,12 +16,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.AchievementsClient;
 import com.google.android.gms.games.AnnotatedData;
 import com.google.android.gms.games.Games;
@@ -148,10 +145,6 @@ public class MainActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final GoogleSignInOptions signInOptions =
-                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN).build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, signInOptions);
-
         mSplashScreenFragment = new SplashScreenFragment();
         mMainMenuFragment = new MainMenuFragment();
         mCameraFragment = new CameraFragment();
@@ -163,8 +156,6 @@ public class MainActivity extends FragmentActivity implements
         mCameraFragment.setCallback(this);
 
         setFragmentToContainer(mSplashScreenFragment);
-        //getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,
-        //        mSplashScreenFragment).commit();
     }
 
     @Override
@@ -181,7 +172,7 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume()");
+        Log.d(TAG, "onResume");
 
         // State of signed in user could change when changing from another app,
         // try and sign in again when the app resumes.
@@ -194,8 +185,11 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void signInSilently() {
-        Log.d(TAG, "signInSilently()");
+        Log.d(TAG, "signInSilently(): Attempting silent sign in.");
 
+        mSplashScreenFragment.setStatus("Attempting sign in...", View.VISIBLE);
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
         mGoogleSignInClient.silentSignIn().addOnCompleteListener(this,
                 new OnCompleteListener<GoogleSignInAccount>() {
                     @Override
@@ -203,25 +197,10 @@ public class MainActivity extends FragmentActivity implements
                         if (task.isSuccessful()) {
                             onConnected(task.getResult());
                         } else {
-                            final ApiException exception = (ApiException) task.getException();
-                            mSplashScreenFragment.setStatus("Failed to sign in...", View.GONE);
-                            if (exception.getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setMessage(R.string.sign_in_other_error)
-                                        .setNeutralButton("Retry", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                startSignInIntent();
-                                            }
-                                        })
-                                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                            @Override
-                                            public void onDismiss(DialogInterface dialog) {
-                                                startSignInIntent();
-                                            }
-                                        })
-                                        .show();
-                            }
+                            Log.d(TAG, "silentSignIn(): failed sign in, requesting account prompt.");
+
+                            Intent intent = mGoogleSignInClient.getSignInIntent();
+                            startActivityForResult(intent, REQUEST_CODE_SIGN_IN);
                         }
                     }
                 });
@@ -229,7 +208,11 @@ public class MainActivity extends FragmentActivity implements
 
     private void startSignInIntent() {
         mSplashScreenFragment.setStatus("Attempting to sign in...", View.VISIBLE);
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
+                GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        Intent intent = signInClient.getSignInIntent();
+        startActivityForResult(intent, REQUEST_CODE_SIGN_IN);
     }
 
     @Override
@@ -237,13 +220,16 @@ public class MainActivity extends FragmentActivity implements
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (requestCode == REQUEST_CODE_SIGN_IN) {
-            Task<GoogleSignInAccount> task =
-                    GoogleSignIn.getSignedInAccountFromIntent(intent);
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
+            Log.d(TAG, "onActivityResult(): Sign in prompt result, successful = " + result.isSuccess());
+            if (result.isSuccess()) {
+                onConnected(result.getSignInAccount());
+            } else {
+                final String errorMessage = result.getStatus().getStatusMessage();
 
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                onConnected(account);
-            } catch (ApiException e) {
+                mSplashScreenFragment.setStatus("Error signing in: " + errorMessage, View.VISIBLE);
+                Log.d(TAG, "onActivityResult(): errorCode = " + result.getStatus().getStatusCode());
+
                 onDisconnected();
             }
         }
@@ -256,6 +242,7 @@ public class MainActivity extends FragmentActivity implements
         mAchievementsClient = Games.getAchievementsClient(this, account);
 
         mSplashScreenFragment.setStatus("Retrieving player information...", View.VISIBLE);
+        Log.d(TAG, "onConnected(): Retrieving player information...");
 
         mPlayersClient.getCurrentPlayer()
                 .addOnCompleteListener(new OnCompleteListener<Player>() {
@@ -264,7 +251,7 @@ public class MainActivity extends FragmentActivity implements
                         if (task.isSuccessful()) {
                             final String username = Objects.requireNonNull(task.getResult()).getDisplayName();
                             mMainMenuFragment.setUsername(username);
-                            Log.d(TAG, "onConnected(): Username - " + username);
+                            Log.d(TAG, "onConnected(): Username = " + username);
                         }
                     }
                 });
@@ -276,7 +263,7 @@ public class MainActivity extends FragmentActivity implements
                         if (task.isSuccessful()) {
                             AchievementBuffer achievementsBuffer = task.getResult().get();
                             if (achievementsBuffer != null) {
-                                Log.d(TAG, Integer.toString(achievementsBuffer.getCount()));
+                                Log.d(TAG, "onConnected(): Achievement count = " + Integer.toString(achievementsBuffer.getCount()));
                                 List<Achievement> achievements = new ArrayList<>();
                                 for (int i = 0; i < achievementsBuffer.getCount(); i++) {
                                     achievements.add(achievementsBuffer.get(i));
@@ -334,11 +321,16 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onShowSettingsRequested() {
-        mGoogleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+        Log.d(TAG, "onShowSettingsRequested(): Sign out requested.");
+
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
+                    Log.d(TAG, "onShowSettingsRequested(): Sign out successful.");
+
                     Toast.makeText(getBaseContext(), "Log out successful.", Toast.LENGTH_LONG).show();
+                    onDisconnected();
                 }
             }
         });
