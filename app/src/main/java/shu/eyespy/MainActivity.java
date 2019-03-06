@@ -293,6 +293,7 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onStartGameRequested() {
         //TODO: Pull which of the 3 items we want the user to be able to choose from.
+        Log.d(TAG, "onStartGameRequested(): Sign out requested.");
 
         setFragmentToContainer(mItemSelectFragment);
     }
@@ -352,18 +353,14 @@ public class MainActivity extends FragmentActivity implements
         FragmentManager fragmentManager = getSupportFragmentManager();
         final String fragmentTag = fragment.getClass().getSimpleName();
 
-        if (isFragmentInBackstack(fragmentManager, fragmentTag)) {
-            // Fragment exists, go back to that fragment
-            //// you can also use POP_BACK_STACK_INCLUSIVE flag, depending on flow
-            fragmentManager.popBackStackImmediate(fragmentTag, 0);
-        } else {
+
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.fragment_container, fragment);
             if (!(fragment instanceof MainMenuFragment)) {
                 transaction.addToBackStack(fragmentTag);
             }
             transaction.commit();
-        }
+        
 
     }
 
