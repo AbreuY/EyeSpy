@@ -7,6 +7,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import shu.eyespy.Item;
 import shu.eyespy.R;
@@ -14,13 +18,12 @@ import shu.eyespy.R;
 
 public class ItemSelectFragment extends Fragment implements View.OnClickListener {
 
-    //TODO: This will change when we are passing them in customly, will hold the list within here for the items.
-    //TODO: Will this be in the mainactivity and the items passed into a setter? Best game practice?
-    private Item[] items = new Item[] {
-            new Item("Banana", Item.ItemDifficulty.EASY),
-            new Item("Dog", Item.ItemDifficulty.MEDIUM),
-            new Item("Castle", Item.ItemDifficulty.HARD)
-    };
+    private View mView;
+    private ArrayList<Item> items;
+
+    private TextView mLevelSelectEasyTextView;
+    private TextView mLevelSelectMediumTextView;
+    private TextView mLevelSelectHardTextView;
 
     private ItemSelectedCallback itemSelectedListener;
 
@@ -28,16 +31,31 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.level_select_easy_button:
-                itemSelectedListener.onItemSelected(items[0]);
+                itemSelectedListener.onItemSelected(items.get(0));
                 break;
             case R.id.level_select_medium_button:
-                itemSelectedListener.onItemSelected(items[1]);
+                itemSelectedListener.onItemSelected(items.get(1));
                 break;
             case R.id.level_select_hard_button:
-                itemSelectedListener.onItemSelected(items[2]);
+                itemSelectedListener.onItemSelected(items.get(2));
                 break;
         }
     }
+
+    public void setItems(ArrayList<Item> items) {
+        this.items = items;
+
+        if (mView != null) {
+            updateUI();
+        }
+    }
+
+    public void updateUI() {
+        mLevelSelectEasyTextView.setText(items.get(0).getName());
+        mLevelSelectMediumTextView.setText(items.get(1).getName());
+        mLevelSelectHardTextView.setText(items.get(2).getName());
+    }
+
 
     public void setSelectedItemCallback(ItemSelectedCallback itemSelectedListener) {
         this.itemSelectedListener = itemSelectedListener;
@@ -46,7 +64,7 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_level_selection, container, false);
+        mView = inflater.inflate(R.layout.fragment_level_selection, container, false);
 
         final int[] clickableIds = new int[]{
                 R.id.level_select_easy_button,
@@ -54,11 +72,17 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
                 R.id.level_select_hard_button,
         };
 
+        mLevelSelectEasyTextView = mView.findViewById(R.id.level_select_easy_text_view);
+        mLevelSelectMediumTextView = mView.findViewById(R.id.level_select_medium_text_view);
+        mLevelSelectHardTextView = mView.findViewById(R.id.level_select_hard_text_view);
+
         for (int clickableId : clickableIds) {
-            view.findViewById(clickableId).setOnClickListener(this);
+            mView.findViewById(clickableId).setOnClickListener(this);
         }
 
-        return view;
+        updateUI();
+
+        return mView;
     }
 
     public interface ItemSelectedCallback {
