@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
+import shu.eyespy.Item;
 import shu.eyespy.R;
 
 //TODO: Change to BaseFragment and don't allow back space.
@@ -24,6 +27,13 @@ public class ResultFragment extends Fragment {
     private View mView;
     private ImageView mImageView;
     private TextView mStatusTextView;
+
+    public void updateResultScreen(boolean result, Item.ItemDifficulty difficulty) {
+        mView.findViewById(R.id.result_progress_layout).setVisibility(View.GONE);
+        mView.findViewById(R.id.result_done_layout).setVisibility(View.VISIBLE);
+
+        ((TextView) mView.findViewById(R.id.result_done_text_view)).setText(result ? String.format(Locale.UK,"Congratulations, your score has increased by %d.", (difficulty.ordinal() + 1)) : "Sorry");
+    }
 
     private Bitmap bitmap;
     private String status;

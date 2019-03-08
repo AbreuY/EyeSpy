@@ -1,5 +1,6 @@
 package shu.eyespy;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -239,10 +240,12 @@ public class MainActivity extends FragmentActivity implements
                 onDisconnected();
             }
         } else if (requestCode == REQUEST_CODE_CAMERA) {
-            Uri imageUri = intent.getData();
+            if(resultCode == Activity.RESULT_OK) {
+                Uri imageUri = intent.getData();
 
-            if (imageUri != null) {
-                uploadImage(imageUri);
+                if (imageUri != null) {
+                    uploadImage(imageUri);
+                }
             }
         }
     }
@@ -375,6 +378,8 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onItemSelected(Item selectedItem) {
+        selectItem = selectedItem;
+
         Intent intent = new Intent(this, CameraActivity.class);
         intent.putExtra("item", selectedItem);
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
@@ -536,7 +541,8 @@ public class MainActivity extends FragmentActivity implements
         protected void onPostExecute(Boolean result) {
             MainActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
-                Toast.makeText(activity, result? "Found": "Not Found", Toast.LENGTH_LONG).show();
+                Log.d(TAG,result.toString());
+                activity.mResultFragment.updateResultScreen(result, selectItem.getDifficulty());
             }
         }
     }

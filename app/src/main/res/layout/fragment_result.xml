@@ -76,7 +76,6 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#86107A"
                 android:orientation="vertical">
 
                 <TextView
@@ -84,27 +83,21 @@
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:maxLines="1"
                     android:textAlignment="center"
-                    android:textSize="20sp" />
+                    android:textSize="24sp"
+                    android:textColor="#FFFFFF"/>
             </LinearLayout>
 
-            <LinearLayout
+            <Button
                 android:id="@+id/result_menu_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="300dp"
+                android:layout_height="80dp"
+                android:layout_marginTop="20dp"
+                android:text="MAIN MENU"
                 android:background="@drawable/curved_button_template"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="300dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:maxLines="1"
-                    android:text="Main Menu"
-                    android:textAlignment="center"
-                    android:textSize="20sp" />
-            </LinearLayout>
+                android:textColor="#FFFF"
+                android:textSize="32sp"
+                />
 
         </LinearLayout>
     </LinearLayout>

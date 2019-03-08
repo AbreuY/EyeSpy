@@ -847,12 +847,14 @@ public class CameraActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+        Item selectedItem = getIntent().getParcelableExtra("item");
 
         mItemTextView = findViewById(R.id.camera_item_text_view);
         mTextureView = findViewById(R.id.texture);
 
         findViewById(R.id.takePicture).setOnClickListener(this);
 
+        mItemTextView.setText(selectedItem.getName());
 
         mFile = new File(this.getExternalFilesDir(null), "pic.jpg");
     }
