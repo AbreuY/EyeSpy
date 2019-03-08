@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import shu.eyespy.fragments.ItemSelectFragment;
 import shu.eyespy.fragments.MainMenuFragment;
@@ -62,7 +63,6 @@ import shu.eyespy.fragments.SplashScreenFragment;
 import shu.eyespy.fragments.TrophiesFragment;
 import shu.eyespy.utilities.PackageManagerUtils;
 
-//TODO: Rearrange the drawable folder to be more organised.
 
 public class MainActivity extends FragmentActivity implements
         MainMenuFragment.Listener,
@@ -90,7 +90,7 @@ public class MainActivity extends FragmentActivity implements
     private PlayersClient mPlayersClient;
     private AchievementsClient mAchievementsClient;
 
-    private static String chosenWord;
+    private static ArrayList<Item> items;
 
     public boolean signedIn = false;
 
@@ -105,48 +105,50 @@ public class MainActivity extends FragmentActivity implements
 
     private static void generateWord()
     {
-        Random randomGenerator  = new Random();
-        ArrayList<String> words = new ArrayList<>( );
-        words.add("Pen");
-        words.add("Keyboard");
-        words.add("Mouse");
-        words.add("Chair");
-        words.add("Book");
-        int index = randomGenerator.nextInt(words.size());
-        StringBuilder message = new StringBuilder();
-        chosenWord = words.get(index);
-        message.append(String.format("Please find the object: %s", chosenWord));
+        items = new ArrayList<>();
+        items.add(new Item("Pen", Item.ItemDifficulty.EASY, new String[] {"Writing implement" } ));
+        items.add(new Item("Keyboard", Item.ItemDifficulty.EASY, new String[] {"Electronic device", "Peripheral" } ));
+        items.add(new Item("Chair", Item.ItemDifficulty.EASY, new String[] {"Furniture"}));
+
+        items.add(new Item("Bottle", Item.ItemDifficulty.MEDIUM, new String[] {"Two-liter bottle", "Plastic bottle", "Water bottle", "Drinkware"}));
+        items.add(new Item("Plant", Item.ItemDifficulty.MEDIUM, new String[] {"Houseplant", "Flowerpot", "Flowering plant", "Vascular plant", "Botany", "Leaf", "Flower", "Herb"}));
+        items.add(new Item("Shoe", Item.ItemDifficulty.MEDIUM, new String[] {"Footwear", "Boot", "Cowboy Boot", "Riding Boot", "Plimsoll shoe", "Skate shoe", "Athletic shoe", "Sneakers"}));
+
+        items.add(new Item("Mouse", Item.ItemDifficulty.HARD, new String[] {"Electronic device", "Peripheral" }));
+        items.add(new Item("Fan", Item.ItemDifficulty.HARD, new String[] { "Mechanical fan"}));
+        items.add(new Item("Hat", Item.ItemDifficulty.HARD, new String[] {"Headgear", "Fedora", "Sun hat", "Sombrero"}));
 
     }
 
-    private static String convertResponseToString(BatchAnnotateImagesResponse response) {
+    private static Boolean searchForItem(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder();
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
+
         if (labels != null) {
             for (EntityAnnotation label : labels) {
                 message.append(String.format(Locale.US, "%.3f: %s", label.getScore(), label.getDescription()));
                 message.append("\n");
             }
-            /*for (EntityAnnotation label : labels) {
-              if(label.getDescription().compareToIgnoreCase(chosenWord) == 0 && label.getScore() >= 0.8)
-              {
-                    message.append("Object Found");
-              }
-              else
-              {
-                  message.append("Incorrect Object");
-              }
-            }*/
-        } else {
-            message.append("Nothing found.");
+            Log.d(TAG, message.toString());
+
+            for (EntityAnnotation label : labels) {
+                String item = label.getDescription();
+
+                if (selectItem.getName().compareToIgnoreCase(item) == 0
+                    || selectItem.getSynonyms().contains(item)) {
+                    return true;
+                }
+            }
         }
-        return message.toString();
+        return false;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        generateWord();
 
         mSplashScreenFragment = new SplashScreenFragment();
         mMainMenuFragment = new MainMenuFragment();
@@ -307,6 +309,24 @@ public class MainActivity extends FragmentActivity implements
         //TODO: Pull which of the 3 items we want the user to be able to choose from.
         Log.d(TAG, "onStartGameRequested(): Sign out requested.");
 
+        ArrayList<Item> threeItems = new ArrayList<>();
+        Random random = new Random();
+
+        List<Item> easy = items.stream()
+                .filter(item -> item.getDifficulty().equals(Item.ItemDifficulty.EASY))
+                .collect(Collectors.toList());
+        List<Item> med = items.stream()
+                .filter(item -> item.getDifficulty().equals(Item.ItemDifficulty.MEDIUM))
+                .collect(Collectors.toList());
+        List<Item> hard = items.stream()
+                .filter(item -> item.getDifficulty().equals(Item.ItemDifficulty.HARD))
+                .collect(Collectors.toList());
+
+
+        threeItems.add(easy.get(random.nextInt(easy.size())));
+        threeItems.add(med.get(random.nextInt(med.size())));
+        threeItems.add(hard.get(random.nextInt(hard.size())));
+        mItemSelectFragment.setItems(threeItems);
         setFragmentToContainer(mItemSelectFragment);
     }
 
@@ -350,6 +370,8 @@ public class MainActivity extends FragmentActivity implements
             }
         });
     }
+
+    private static Item selectItem;
 
     @Override
     public void onItemSelected(Item selectedItem) {
@@ -463,7 +485,7 @@ public class MainActivity extends FragmentActivity implements
         // Do the real work in an async task, because we need to use the network anyway
         try {
             Log.d(TAG,"callCloudVision");
-            AsyncTask<Object, Void, String> labelDetectionTask = new LableDetectionTask(this, prepareAnnotationRequest(bitmap));
+            AsyncTask<Object, Void, Boolean> labelDetectionTask = new LableDetectionTask(this, prepareAnnotationRequest(bitmap));
             labelDetectionTask.execute();
         } catch (IOException e) {
             Log.d(TAG, "failed to make API request because of other IOException " +
@@ -486,7 +508,7 @@ public class MainActivity extends FragmentActivity implements
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 
-    private static class LableDetectionTask extends AsyncTask<Object, Void, String> {
+    private static class LableDetectionTask extends AsyncTask<Object, Void, Boolean> {
         private final WeakReference<MainActivity> mActivityWeakReference;
 
         private Vision.Images.Annotate mRequest;
@@ -497,25 +519,24 @@ public class MainActivity extends FragmentActivity implements
         }
 
         @Override
-        protected String doInBackground(Object... params) {
+        protected Boolean doInBackground(Object... params) {
             try {
                 Log.d(TAG, "created Cloud Vision request object, sending request");
                 BatchAnnotateImagesResponse response = mRequest.execute();
-                return convertResponseToString(response);
+                return searchForItem(response);
             } catch (GoogleJsonResponseException e) {
                 Log.d(TAG, "failed to make API request because " + e.getContent());
             } catch (IOException e) {
                 Log.d(TAG, "failed to make API request because of other IOException " +
                         e.getMessage());
             }
-            return "Cloud Vision API request failed. Check logs for details.";
+            return false;
         }
 
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(Boolean result) {
             MainActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
-                Toast.makeText(activity, result, Toast.LENGTH_LONG).show();
-                Log.d(TAG, result);
+                Toast.makeText(activity, result? "Found": "Not Found", Toast.LENGTH_LONG).show();
             }
         }
     }

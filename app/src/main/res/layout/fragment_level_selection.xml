@@ -43,7 +43,6 @@
             android:id="@+id/level_select_easy_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="BANANA"
             android:textColor="#FFFF"
             android:textSize="40sp" />
 
@@ -84,7 +83,6 @@
             android:id="@+id/level_select_medium_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DOG"
             android:textColor="#FFFF"
             android:textSize="40sp" />
 
@@ -133,7 +131,6 @@
             android:id="@+id/level_select_hard_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CASTLE"
             android:textColor="#FFFF"
             android:textSize="40sp" />
 

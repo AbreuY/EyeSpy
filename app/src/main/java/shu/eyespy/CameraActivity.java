@@ -24,6 +24,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
 import android.media.ImageReader;
 import android.net.Uri;
 import android.os.Handler;
@@ -45,6 +46,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,7 +58,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import shu.eyespy.utilities.AutoFitTextureView;
-import shu.eyespy.utilities.ImageSaver;
 
 public class CameraActivity extends AppCompatActivity
         implements View.OnClickListener {
@@ -142,7 +145,28 @@ public class CameraActivity extends AppCompatActivity
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            Image image = reader.acquireNextImage();
+            ByteBuffer buffer = image.getPlanes()[0].getBuffer(); // As image is saved as JPEG, get the first plane.
+            byte[] bytes = new byte[buffer.remaining()]; // Create array with the size of the bytebuffer
+            buffer.get(bytes); // Populate the array with the bytes from the buffer.
+
+            FileOutputStream output = null;
+
+            try {
+                output = new FileOutputStream(mFile); // Open the file we would like to save too.
+                output.write(bytes); // Write the bytes to the file.
+            } catch (IOException e) {
+                Log.e(TAG, "Trying to write image to file failed. ");
+            } finally {
+                image.close();
+                if (output != null) {
+                    try {
+                        output.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Failed to close FileOutputStream. ");
+                    }
+                }
+            }
         }
 
     };
