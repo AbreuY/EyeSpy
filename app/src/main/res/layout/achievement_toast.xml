@@ -9,11 +9,12 @@
     >
     
     <ImageView
+        android:id="@+id/achievement_toast_trophy"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center_vertical"
         android:layout_marginStart="20dp"
-        android:src="@drawable/trophy_shadow"/>
+        android:src="@drawable/trophy_locked"/>
 
     <LinearLayout
         android:layout_width="200dp"

@@ -57,6 +57,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import shu.eyespy.fragments.BaseFragment;
 import shu.eyespy.fragments.ItemSelectFragment;
 import shu.eyespy.fragments.MainMenuFragment;
 import shu.eyespy.fragments.ResultFragment;
@@ -171,7 +172,22 @@ public class MainActivity extends FragmentActivity implements
             super.onBackPressed();
             //additional code
         } else {
-            getSupportFragmentManager().popBackStack();
+            List fragmentList = getSupportFragmentManager().getFragments();
+
+            boolean handled = false;
+            for(Object f : fragmentList) {
+                if(f instanceof BaseFragment) {
+                    handled = ((BaseFragment)f).onBackPressed();
+
+                    if(handled) {
+                        break;
+                    }
+                }
+            }
+
+            if (!handled) {
+                getSupportFragmentManager().popBackStack();
+            }
         }
     }
 
@@ -271,7 +287,7 @@ public class MainActivity extends FragmentActivity implements
                     }
                 });
 
-        mAchievementsClient.load(false)
+        mAchievementsClient.load(true)
                 .addOnCompleteListener(new OnCompleteListener<AnnotatedData<AchievementBuffer>>() {
                     @Override
                     public void onComplete(@NonNull Task<AnnotatedData<AchievementBuffer>> task) {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Google Play game services IDs.
+Save this file as res/values/games-ids.xml in your project.
+-->
+<resources>
+    <!-- app_id -->
+    <string name="app_id" translatable="false">22143793012</string>
+    <!-- package_name -->
+    <string name="package_name" translatable="false">shu.eyespy</string>
+    <!-- achievement First Class -->
+    <string name="achievement_first_class" translatable="false">CggI9O79vlIQAhAB</string>
+    <!-- achievement Ten's a Charm -->
+    <string name="achievement_tens_a_charm" translatable="false">CggI9O79vlIQAhAC</string>
+    <!-- achievement Point Novice -->
+    <string name="achievement_point_novice" translatable="false">CggI9O79vlIQAhAD</string>
+    <!-- achievement Point Hunter -->
+    <string name="achievement_point_hunter" translatable="false">CggI9O79vlIQAhAE</string>
+    <!-- achievement Point Master -->
+    <string name="achievement_point_master" translatable="false">CggI9O79vlIQAhAF</string>
+    <!-- leaderboard Scores -->
+    <string name="leaderboard_scores" translatable="false">CggI9O79vlIQAhAG</string>
+</resources>

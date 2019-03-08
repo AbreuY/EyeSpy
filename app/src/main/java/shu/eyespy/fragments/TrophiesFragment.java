@@ -24,9 +24,11 @@ import java.util.List;
 import shu.eyespy.R;
 
 
-public class TrophiesFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class TrophiesFragment extends BaseFragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = TrophiesFragment.class.getSimpleName();
+
+    private Toast mAchievementToast;
     private View mView;
     private GridView mTrophiesGridView;
     private Trophies mTrophies;
@@ -70,17 +72,45 @@ public class TrophiesFragment extends Fragment implements AdapterView.OnItemClic
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.achievement_toast, (ViewGroup) view.findViewById(R.id.achievement_toast_root));
 
-        TextView achievementTitleTextView = layout.findViewById(R.id.achievement_toast_title);
-        achievementTitleTextView.setText(mTrophies.getAchievement(position).getName());
-        TextView achievementDescriptionTextView = layout.findViewById(R.id.achievement_toast_description);
-        achievementDescriptionTextView.setText(mTrophies.getAchievement(position).getDescription());
+        String title = "???", description = "???";
+        Achievement achievement = mTrophies.getAchievement(position);
+        if (achievement.getState() == Achievement.STATE_REVEALED
+                || achievement.getState() == Achievement.STATE_UNLOCKED) {
+            title = achievement.getName();
+            description = achievement.getDescription();
+        }
 
-        Toast toast = new Toast(getContext());
-        toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, 80);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.setView(layout);
-        toast.show();
+        ImageView trophy = layout.findViewById(R.id.achievement_toast_trophy);
+        if (/*achievement.getState() == Achievement.STATE_REVEALED
+                    || */achievement.getState() == Achievement.STATE_HIDDEN) {
+            trophy.setImageResource(R.drawable.trophy_locked);
+        } else {
+            trophy.setImageResource(R.drawable.trophy_unlocked);
+        }
+
+        TextView achievementTitleTextView = layout.findViewById(R.id.achievement_toast_title);
+        TextView achievementDescriptionTextView = layout.findViewById(R.id.achievement_toast_description);
+
+        achievementTitleTextView.setText(title);
+        achievementDescriptionTextView.setText(description);
+
+        mAchievementToast= new Toast(getContext());
+        mAchievementToast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, 80);
+        mAchievementToast.setDuration(Toast.LENGTH_LONG);
+        mAchievementToast.setView(layout);
+        mAchievementToast.show();
     }
+
+    @Override
+    public boolean onBackPressed() {
+        if (mAchievementToast != null) {
+            mAchievementToast.cancel();
+            mAchievementToast = null;
+            return true;
+        }
+        return false;
+    }
+
 
     class Trophies extends BaseAdapter {
 
@@ -127,11 +157,11 @@ public class TrophiesFragment extends Fragment implements AdapterView.OnItemClic
             }
 
             Achievement achievement = mAchievements.get(position);
-            if (achievement.getState() == Achievement.STATE_REVEALED
-                    || achievement.getState() == Achievement.STATE_HIDDEN) {
-                imageView.setImageResource(R.drawable.trophy_shadow);
+            if (/*achievement.getState() == Achievement.STATE_REVEALED
+                    || */achievement.getState() == Achievement.STATE_HIDDEN) {
+                imageView.setImageResource(R.drawable.trophy_locked);
             } else {
-                imageView.setImageURI(achievement.getUnlockedImageUri());
+                imageView.setImageResource(R.drawable.trophy_unlocked);
             }
             return imageView;
         }

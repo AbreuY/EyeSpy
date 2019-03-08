@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">EyeSpy</string>
-    <string name="app_id">22143793012</string>
 
     <string name="players_avatar_content_desc">This contains the image for players avatar.</string>
     <string name="main_menu_options_button">OPTIONS</string>
