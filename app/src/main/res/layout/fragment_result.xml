@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1DADA7"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/result_title_button"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="55dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/header_button_template"
+        android:text="Results"
+        android:textColor="#FFFF"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:id="@+id/result_image_taken"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:adjustViewBounds="true" />
+
+        <LinearLayout
+            android:id="@+id/result_progress_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/curved_button_template"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/result_progress"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:indeterminate="true" />
+
+            <TextView
+                android:id="@+id/result_status_text_view"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                android:maxLines="1"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/result_done_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/result_done_text_view"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:textAlignment="center"
+                    android:textSize="24sp"
+                    android:textColor="#FFFFFF"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/result_menu_button"
+                android:layout_width="300dp"
+                android:layout_height="80dp"
+                android:layout_marginTop="20dp"
+                android:text="MAIN MENU"
+                android:background="@drawable/curved_button_template"
+                android:textColor="#FFFF"
+                android:textSize="32sp"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
+

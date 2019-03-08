@@ -1,20 +1,4 @@
-/*
- * Copyright 2017 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-package shu.eyespy.fragments;
+package shu.eyespy;
 
 import android.Manifest;
 import android.app.Activity;
@@ -22,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
@@ -39,15 +24,17 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
 import android.media.ImageReader;
-import android.os.Bundle;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -55,11 +42,13 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -68,16 +57,12 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import shu.eyespy.Item;
-import shu.eyespy.R;
 import shu.eyespy.utilities.AutoFitTextureView;
-import shu.eyespy.utilities.ImageSaver;
 
-public class CameraFragment extends Fragment
-        implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
+public class CameraActivity extends AppCompatActivity
+        implements View.OnClickListener {
 
-    private TextView mItemTextView;
-    private View mView;
+    private static final String TAG = CameraActivity.class.getSimpleName();
 
     /**
      * Conversion from screen rotation to JPEG orientation.
@@ -85,6 +70,28 @@ public class CameraFragment extends Fragment
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
+    private TextView mItemTextView;
+
+    /**
+     * Camera state: Showing camera preview.
+     */
+    private static final int STATE_PREVIEW = 0;
+    /**
+     * Camera state: Waiting for the focus to be locked.
+     */
+    private static final int STATE_WAITING_LOCK = 1;
+    /**
+     * Camera state: Waiting for the exposure to be precapture state.
+     */
+    private static final int STATE_WAITING_PRECAPTURE = 2;
+    /**
+     * Camera state: Waiting for the exposure state to be something other than precapture.
+     */
+    private static final int STATE_WAITING_NON_PRECAPTURE = 3;
+    /**
+     * Camera state: Picture was taken.
+     */
+    private static final int STATE_PICTURE_TAKEN = 4;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -93,166 +100,42 @@ public class CameraFragment extends Fragment
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
-    //TODO: Change this to behave like a callback
-    public interface Callback {
-        void onImageTaken(File file);
-    }
-
-    private Item selectedItem;
-
-    public void setSelectedItem(Item selectedItem) {
-        this.selectedItem = selectedItem;
-        updateUI();
-    }
-
-    private void updateUI() {
-        if (mView == null) {
-            return;
-        }
-
-        mItemTextView.setText(selectedItem.getName());
-    }
-
-    private Callback mCallback = null;
-
-    public void setCallback(Callback callback) {
-        this.mCallback = callback;
-    }
-
-    private static final String TAG = CameraFragment.class.getSimpleName();
-
-    /**
-     * Camera state: Showing camera preview.
-     */
-    private static final int STATE_PREVIEW = 0;
-
-    /**
-     * Camera state: Waiting for the focus to be locked.
-     */
-    private static final int STATE_WAITING_LOCK = 1;
-
-    /**
-     * Camera state: Waiting for the exposure to be precapture state.
-     */
-    private static final int STATE_WAITING_PRECAPTURE = 2;
-
-    /**
-     * Camera state: Waiting for the exposure state to be something other than precapture.
-     */
-    private static final int STATE_WAITING_NON_PRECAPTURE = 3;
-
-    /**
-     * Camera state: Picture was taken.
-     */
-    private static final int STATE_PICTURE_TAKEN = 4;
-
-
-    /**
-     * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
-     * {@link TextureView}.
-     */
-    private final TextureView.SurfaceTextureListener mSurfaceTextureListener
-            = new TextureView.SurfaceTextureListener() {
-
-        @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
-            openCamera(width, height);
-        }
-
-        @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
-            configureTransform(width, height);
-        }
-
-        @Override
-        public boolean onSurfaceTextureDestroyed(SurfaceTexture texture) {
-            return true;
-        }
-
-        @Override
-        public void onSurfaceTextureUpdated(SurfaceTexture texture) {
-        }
-
-    };
-
     /**
      * ID of the current {@link CameraDevice}.
      */
     private String mCameraId;
-
     /**
      * An {@link AutoFitTextureView} for camera preview.
      */
     private AutoFitTextureView mTextureView;
-
     /**
      * A {@link CameraCaptureSession } for camera preview.
      */
     private CameraCaptureSession mCaptureSession;
-
     /**
      * A reference to the opened {@link CameraDevice}.
      */
     private CameraDevice mCameraDevice;
-
     /**
      * The {@link Size} of camera preview.
      */
     private Size mPreviewSize;
-
-    /**
-     * {@link CameraDevice.StateCallback} is called when {@link CameraDevice} changes its state.
-     */
-    private final CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
-
-        @Override
-        public void onOpened(@NonNull CameraDevice cameraDevice) {
-            // This method is called when the camera is opened.  We start camera preview here.
-            mCameraOpenCloseLock.release();
-            mCameraDevice = cameraDevice;
-            createCameraPreviewSession();
-        }
-
-        @Override
-        public void onDisconnected(@NonNull CameraDevice cameraDevice) {
-            mCameraOpenCloseLock.release();
-            cameraDevice.close();
-            mCameraDevice = null;
-        }
-
-        @Override
-        public void onError(@NonNull CameraDevice cameraDevice, int error) {
-            mCameraOpenCloseLock.release();
-            cameraDevice.close();
-            mCameraDevice = null;
-            Activity activity = getActivity();
-            if (null != activity) {
-                activity.finish();
-            }
-        }
-
-    };
-
     /**
      * An additional thread for running tasks that shouldn't block the UI.
      */
     private HandlerThread mBackgroundThread;
-
     /**
      * A {@link Handler} for running tasks in the background.
      */
     private Handler mBackgroundHandler;
-
     /**
      * An {@link ImageReader} that handles still image capture.
      */
     private ImageReader mImageReader;
-
     /**
      * This is the output file for our picture.
      */
     private File mFile;
-
     /**
      * This a callback object for the {@link ImageReader}. "onImageAvailable" will be called when a
      * still image is ready to be saved.
@@ -262,43 +145,57 @@ public class CameraFragment extends Fragment
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            Image image = reader.acquireNextImage();
+            ByteBuffer buffer = image.getPlanes()[0].getBuffer(); // As image is saved as JPEG, get the first plane.
+            byte[] bytes = new byte[buffer.remaining()]; // Create array with the size of the bytebuffer
+            buffer.get(bytes); // Populate the array with the bytes from the buffer.
+
+            FileOutputStream output = null;
+
+            try {
+                output = new FileOutputStream(mFile); // Open the file we would like to save too.
+                output.write(bytes); // Write the bytes to the file.
+            } catch (IOException e) {
+                Log.e(TAG, "Trying to write image to file failed. ");
+            } finally {
+                image.close();
+                if (output != null) {
+                    try {
+                        output.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Failed to close FileOutputStream. ");
+                    }
+                }
+            }
         }
 
     };
-
     /**
      * {@link CaptureRequest.Builder} for the camera preview
      */
     private CaptureRequest.Builder mPreviewRequestBuilder;
-
     /**
      * {@link CaptureRequest} generated by {@link #mPreviewRequestBuilder}
      */
     private CaptureRequest mPreviewRequest;
-
     /**
      * The current state of camera state for taking pictures.
      *
      * @see #mCaptureCallback
      */
     private int mState = STATE_PREVIEW;
-
     /**
      * A {@link Semaphore} to prevent the app from exiting before closing the camera.
      */
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
-
     /**
      * Whether the current camera device supports Flash or not.
      */
     private boolean mFlashSupported;
-
     /**
      * Orientation of the camera sensor
      */
     private int mSensorOrientation;
-
     /**
      * A {@link CameraCaptureSession.CaptureCallback} that handles events related to JPEG capture.
      */
@@ -366,23 +263,62 @@ public class CameraFragment extends Fragment
         }
 
     };
-
     /**
-     * Shows a {@link Toast} on the UI thread.
-     *
-     * @param text The message to show
+     * {@link CameraDevice.StateCallback} is called when {@link CameraDevice} changes its state.
      */
-    private void showToast(final String text) {
-        final Activity activity = getActivity();
-        if (activity != null) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(activity, text, Toast.LENGTH_SHORT).show();
-                }
-            });
+    private final CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
+
+        @Override
+        public void onOpened(@NonNull CameraDevice cameraDevice) {
+            // This method is called when the camera is opened.  We start camera preview here.
+            mCameraOpenCloseLock.release();
+            mCameraDevice = cameraDevice;
+            createCameraPreviewSession();
         }
-    }
+
+        @Override
+        public void onDisconnected(@NonNull CameraDevice cameraDevice) {
+            mCameraOpenCloseLock.release();
+            cameraDevice.close();
+            mCameraDevice = null;
+        }
+
+        @Override
+        public void onError(@NonNull CameraDevice cameraDevice, int error) {
+            mCameraOpenCloseLock.release();
+            cameraDevice.close();
+            mCameraDevice = null;
+            finish();
+        }
+
+    };
+    /**
+     * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
+     * {@link TextureView}.
+     */
+    private final TextureView.SurfaceTextureListener mSurfaceTextureListener
+            = new TextureView.SurfaceTextureListener() {
+
+        @Override
+        public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
+            openCamera(width, height);
+        }
+
+        @Override
+        public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
+            configureTransform(width, height);
+        }
+
+        @Override
+        public boolean onSurfaceTextureDestroyed(SurfaceTexture texture) {
+            return true;
+        }
+
+        @Override
+        public void onSurfaceTextureUpdated(SurfaceTexture texture) {
+        }
+
+    };
 
     /**
      * Given {@code choices} of {@code Size}s supported by a camera, choose the smallest one that
@@ -413,7 +349,7 @@ public class CameraFragment extends Fragment
             if (option.getWidth() <= maxWidth && option.getHeight() <= maxHeight &&
                     option.getHeight() == option.getWidth() * h / w) {
                 if (option.getWidth() >= textureViewWidth &&
-                    option.getHeight() >= textureViewHeight) {
+                        option.getHeight() >= textureViewHeight) {
                     bigEnough.add(option);
                 } else {
                     notBigEnough.add(option);
@@ -433,25 +369,13 @@ public class CameraFragment extends Fragment
         }
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_camera, container, false);
-
-        mItemTextView = mView.findViewById(R.id.camera_item_text_view);
-        mTextureView = mView.findViewById(R.id.texture);
-
-        mView.findViewById(R.id.takePicture).setOnClickListener(this);
-
-        updateUI();
-
-        return mView;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+    /**
+     * Shows a {@link Toast} on the UI thread.
+     *
+     * @param text The message to show
+     */
+    private void showToast(final String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -479,7 +403,7 @@ public class CameraFragment extends Fragment
 
     private void requestCameraPermission() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-            new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
+            new ConfirmationDialog().show(getSupportFragmentManager(), FRAGMENT_DIALOG);
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
         }
@@ -491,7 +415,7 @@ public class CameraFragment extends Fragment
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 ErrorDialog.newInstance(getString(R.string.request_camera_permission))
-                        .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+                        .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -506,8 +430,7 @@ public class CameraFragment extends Fragment
      */
     @SuppressWarnings("SuspiciousNameCombination")
     private void setUpCameraOutputs(int width, int height) {
-        Activity activity = getActivity();
-        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+        CameraManager manager = (CameraManager) this.getSystemService(Context.CAMERA_SERVICE);
         try {
             for (String cameraId : manager.getCameraIdList()) {
                 CameraCharacteristics characteristics
@@ -536,7 +459,7 @@ public class CameraFragment extends Fragment
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor
                 // coordinate.
-                int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+                int displayRotation = getWindowManager().getDefaultDisplay().getRotation();
                 //noinspection ConstantConditions
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 boolean swappedDimensions = false;
@@ -558,7 +481,7 @@ public class CameraFragment extends Fragment
                 }
 
                 Point displaySize = new Point();
-                activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
+                getWindowManager().getDefaultDisplay().getSize(displaySize);
                 int rotatedPreviewWidth = width;
                 int rotatedPreviewHeight = height;
                 int maxPreviewWidth = displaySize.x;
@@ -605,24 +528,24 @@ public class CameraFragment extends Fragment
         } catch (NullPointerException e) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-            ErrorDialog.newInstance(getString(R.string.camera_error))
-                    .show(getChildFragmentManager(), FRAGMENT_DIALOG);
+            CameraActivity.ErrorDialog.newInstance(getString(R.string.camera_error))
+                    .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
         }
     }
 
     /**
-     * Opens the camera specified by {@link CameraFragment#mCameraId}.
+     * Opens the camera specified by {@link CameraActivity#mCameraId}.
      */
     private void openCamera(int width, int height) {
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission();
             return;
         }
         setUpCameraOutputs(width, height);
         configureTransform(width, height);
-        Activity activity = getActivity();
-        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+
+        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
@@ -752,11 +675,10 @@ public class CameraFragment extends Fragment
      * @param viewHeight The height of `mTextureView`
      */
     private void configureTransform(int viewWidth, int viewHeight) {
-        Activity activity = getActivity();
-        if (null == mTextureView || null == mPreviewSize || null == activity) {
+        if (null == mTextureView || null == mPreviewSize) {
             return;
         }
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
@@ -824,8 +746,7 @@ public class CameraFragment extends Fragment
      */
     private void captureStillPicture() {
         try {
-            final Activity activity = getActivity();
-            if (null == activity || null == mCameraDevice) {
+            if (null == mCameraDevice) {
                 return;
             }
             // This is the CaptureRequest.Builder that we use to take a picture.
@@ -839,7 +760,7 @@ public class CameraFragment extends Fragment
             setAutoFlash(captureBuilder);
 
             // Orientation
-            int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+            int rotation = getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
 
             CameraCaptureSession.CaptureCallback CaptureCallback
@@ -850,8 +771,13 @@ public class CameraFragment extends Fragment
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
                     unlockFocus();
-                    showToast("Saved: " + mFile);
-                    mCallback.onImageTaken(mFile);
+
+                    Intent intent = getIntent();
+                    intent.setData(Uri.fromFile(mFile));
+                    setResult(RESULT_OK, intent);
+                    finish();
+
+                    /*//stopBackgroundThread();*/
                     Log.d(TAG, mFile.toString());
                 }
             };
@@ -914,6 +840,23 @@ public class CameraFragment extends Fragment
             requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
         }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_camera);
+
+        Item selectedItem = getIntent().getParcelableExtra("item");
+
+        mItemTextView = findViewById(R.id.camera_item_text_view);
+        mTextureView = findViewById(R.id.texture);
+
+        findViewById(R.id.takePicture).setOnClickListener(this);
+
+        mItemTextView.setText(selectedItem.getName());
+
+        mFile = new File(this.getExternalFilesDir(null), "pic.jpg");
     }
 
     /**
@@ -993,5 +936,4 @@ public class CameraFragment extends Fragment
                     .create();
         }
     }
-
 }
