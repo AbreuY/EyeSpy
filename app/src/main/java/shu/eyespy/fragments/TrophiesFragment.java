@@ -24,9 +24,11 @@ import java.util.List;
 import shu.eyespy.R;
 
 
-public class TrophiesFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class TrophiesFragment extends BaseFragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = TrophiesFragment.class.getSimpleName();
+
+    private Toast mAchievementToast;
     private View mView;
     private GridView mTrophiesGridView;
     private Trophies mTrophies;
@@ -92,12 +94,23 @@ public class TrophiesFragment extends Fragment implements AdapterView.OnItemClic
         achievementTitleTextView.setText(title);
         achievementDescriptionTextView.setText(description);
 
-        Toast toast = new Toast(getContext());
-        toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, 80);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.setView(layout);
-        toast.show();
+        mAchievementToast= new Toast(getContext());
+        mAchievementToast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, 80);
+        mAchievementToast.setDuration(Toast.LENGTH_LONG);
+        mAchievementToast.setView(layout);
+        mAchievementToast.show();
     }
+
+    @Override
+    public boolean onBackPressed() {
+        if (mAchievementToast != null) {
+            mAchievementToast.cancel();
+            mAchievementToast = null;
+            return true;
+        }
+        return false;
+    }
+
 
     class Trophies extends BaseAdapter {
 

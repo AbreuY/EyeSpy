@@ -55,6 +55,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
+import shu.eyespy.fragments.BaseFragment;
 import shu.eyespy.fragments.CameraFragment;
 import shu.eyespy.fragments.ItemSelectFragment;
 import shu.eyespy.fragments.MainMenuFragment;
@@ -165,7 +166,22 @@ public class MainActivity extends FragmentActivity implements
             super.onBackPressed();
             //additional code
         } else {
-            getSupportFragmentManager().popBackStack();
+            List fragmentList = getSupportFragmentManager().getFragments();
+
+            boolean handled = false;
+            for(Object f : fragmentList) {
+                if(f instanceof BaseFragment) {
+                    handled = ((BaseFragment)f).onBackPressed();
+
+                    if(handled) {
+                        break;
+                    }
+                }
+            }
+
+            if (!handled) {
+                getSupportFragmentManager().popBackStack();
+            }
         }
     }
 
