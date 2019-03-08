@@ -55,7 +55,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
-import shu.eyespy.fragments.CameraFragment;
 import shu.eyespy.fragments.ItemSelectFragment;
 import shu.eyespy.fragments.MainMenuFragment;
 import shu.eyespy.fragments.SplashScreenFragment;
@@ -66,8 +65,7 @@ import shu.eyespy.utilities.PackageManagerUtils;
 
 public class MainActivity extends FragmentActivity implements
         MainMenuFragment.Listener,
-        ItemSelectFragment.ItemSelectedCallback,
-        CameraFragment.Callback {
+        ItemSelectFragment.ItemSelectedCallback {
 
     private static final String CLOUD_VISION_API_KEY = "AIzaSyD1-hvw0TcwQnfN0rXYHCEQWtruyl6Lmfo";
     private static final int MAX_DIMENSION = 1200;
@@ -77,12 +75,12 @@ public class MainActivity extends FragmentActivity implements
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 9001;
-    private static final int REQUEST_CODE_UNUSED = 9002;
+    private static final int REQUEST_CODE_CAMERA = 9002;
+    private static final int REQUEST_CODE_UNUSED = 9003;
 
     private SplashScreenFragment mSplashScreenFragment;
     private MainMenuFragment mMainMenuFragment;
     private ItemSelectFragment mItemSelectFragment;
-    private CameraFragment mCameraFragment;
     private TrophiesFragment mTrophiesFragment;
 
     private GoogleSignInClient mGoogleSignInClient;
@@ -147,13 +145,11 @@ public class MainActivity extends FragmentActivity implements
 
         mSplashScreenFragment = new SplashScreenFragment();
         mMainMenuFragment = new MainMenuFragment();
-        mCameraFragment = new CameraFragment();
         mTrophiesFragment = new TrophiesFragment();
         mItemSelectFragment = new ItemSelectFragment();
 
         mMainMenuFragment.setListener(this);
         mItemSelectFragment.setSelectedItemCallback(this);
-        mCameraFragment.setCallback(this);
 
         setFragmentToContainer(mSplashScreenFragment);
     }
@@ -232,6 +228,12 @@ public class MainActivity extends FragmentActivity implements
 
                 onDisconnected();
             }
+        } else if (requestCode == REQUEST_CODE_CAMERA) {
+            Uri imageUri = intent.getData();
+            if (imageUri != null) {
+                setFragmentToContainer(mMainMenuFragment);
+                uploadImage(imageUri);
+            }
         }
     }
 
@@ -291,6 +293,7 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onStartGameRequested() {
         //TODO: Pull which of the 3 items we want the user to be able to choose from.
+        Log.d(TAG, "onStartGameRequested(): Sign out requested.");
 
         setFragmentToContainer(mItemSelectFragment);
     }
@@ -338,33 +341,34 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onItemSelected(Item selectedItem) {
-        mCameraFragment.setSelectedItem(selectedItem);
-        setFragmentToContainer(mCameraFragment);
+        Intent intent = new Intent(this, CameraActivity.class);
+        intent.putExtra("item", selectedItem);
+        startActivityForResult(intent, REQUEST_CODE_CAMERA);
+        //mCameraFragment.setSelectedItem(selectedItem);
+        //setFragmentToContainer(mCameraFragment);
     }
+
 
     public void setFragmentToContainer(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         final String fragmentTag = fragment.getClass().getSimpleName();
 
-        if (isFragmentInBackstack(fragmentManager, fragmentTag)) {
-            // Fragment exists, go back to that fragment
-            //// you can also use POP_BACK_STACK_INCLUSIVE flag, depending on flow
-            fragmentManager.popBackStackImmediate(fragmentTag, 0);
-        } else {
+
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.fragment_container, fragment);
             if (!(fragment instanceof MainMenuFragment)) {
                 transaction.addToBackStack(fragmentTag);
             }
             transaction.commit();
-        }
+        
 
     }
 
-    @Override
+    /*@Override
     public void onImageTaken(File file) {
+        setFragmentToContainer(mSplashScreenFragment);
         uploadImage(Uri.fromFile(file));
-    }
+    }*/
 
     public void uploadImage(Uri uri) {
         if (uri != null) {
