@@ -32,7 +32,10 @@ public class ResultFragment extends Fragment {
         mView.findViewById(R.id.result_progress_layout).setVisibility(View.GONE);
         mView.findViewById(R.id.result_done_layout).setVisibility(View.VISIBLE);
 
-        ((TextView) mView.findViewById(R.id.result_done_text_view)).setText(result ? String.format(Locale.UK,"Congratulations, your score has increased by %d.", (difficulty.ordinal() + 1)) : "Sorry");
+        ((TextView) mView.findViewById(R.id.result_done_text_view))
+                .setText(result ?
+                        String.format(Locale.UK,"Congratulations, your score has increased by %d.", (difficulty.ordinal() + 1))
+                        : "Sorry, item was not found in the image.");
     }
 
     private Bitmap bitmap;

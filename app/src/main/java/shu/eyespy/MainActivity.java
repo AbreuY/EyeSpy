@@ -31,6 +31,7 @@ import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.android.gms.games.achievement.AchievementBuffer;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -79,7 +80,7 @@ public class MainActivity extends FragmentActivity implements
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 9001;
     private static final int REQUEST_CODE_CAMERA = 9002;
-    private static final int REQUEST_CODE_UNUSED = 9003;
+    private static final int REQUEST_CODE_LEADERBOARD = 9003;
 
     private SplashScreenFragment mSplashScreenFragment;
     private MainMenuFragment mMainMenuFragment;
@@ -88,7 +89,6 @@ public class MainActivity extends FragmentActivity implements
     private ResultFragment mResultFragment;
 
     private GoogleSignInClient mGoogleSignInClient;
-    private GoogleSignInAccount mGoogleSignInAccount;
     private PlayersClient mPlayersClient;
     private AchievementsClient mAchievementsClient;
 
@@ -363,14 +363,9 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onShowLeaderboardRequested() {
-        // If not signed in then try and sign in.
-        if (!isSignedIn()) {
-            startSignInIntent();
-        }
-
-        if (isSignedIn()) {
-            // TODO: Show Leaderboard Fragment
-        }
+        Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .getLeaderboardIntent(getString(R.string.leaderboard_scores))
+                .addOnSuccessListener(intent -> startActivityForResult(intent, REQUEST_CODE_LEADERBOARD));
     }
 
     @Override
