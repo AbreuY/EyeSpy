@@ -23,7 +23,6 @@ public class SplashScreenFragment extends Fragment {
 
     private TextView mStatusTextView;
     private ProgressBar mProgressBar;
-    private Button mSignInRetryButton;
 
     @Nullable
     @Override

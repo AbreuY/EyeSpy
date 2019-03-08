@@ -57,6 +57,7 @@ import java.util.Random;
 
 import shu.eyespy.fragments.ItemSelectFragment;
 import shu.eyespy.fragments.MainMenuFragment;
+import shu.eyespy.fragments.ResultFragment;
 import shu.eyespy.fragments.SplashScreenFragment;
 import shu.eyespy.fragments.TrophiesFragment;
 import shu.eyespy.utilities.PackageManagerUtils;
@@ -82,12 +83,16 @@ public class MainActivity extends FragmentActivity implements
     private MainMenuFragment mMainMenuFragment;
     private ItemSelectFragment mItemSelectFragment;
     private TrophiesFragment mTrophiesFragment;
+    private ResultFragment mResultFragment;
 
     private GoogleSignInClient mGoogleSignInClient;
+    private GoogleSignInAccount mGoogleSignInAccount;
     private PlayersClient mPlayersClient;
     private AchievementsClient mAchievementsClient;
 
     private static String chosenWord;
+
+    public boolean signedIn = false;
 
     public static boolean isFragmentInBackstack(final FragmentManager fragmentManager, final String fragmentTagName) {
         for (int entry = 0; entry < fragmentManager.getBackStackEntryCount(); entry++) {
@@ -147,11 +152,13 @@ public class MainActivity extends FragmentActivity implements
         mMainMenuFragment = new MainMenuFragment();
         mTrophiesFragment = new TrophiesFragment();
         mItemSelectFragment = new ItemSelectFragment();
+        mResultFragment = new ResultFragment();
 
         mMainMenuFragment.setListener(this);
         mItemSelectFragment.setSelectedItemCallback(this);
 
         setFragmentToContainer(mSplashScreenFragment);
+
     }
 
     @Override
@@ -218,6 +225,7 @@ public class MainActivity extends FragmentActivity implements
         if (requestCode == REQUEST_CODE_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
             Log.d(TAG, "onActivityResult(): Sign in prompt result, successful = " + result.isSuccess());
+
             if (result.isSuccess()) {
                 onConnected(result.getSignInAccount());
             } else {
@@ -230,8 +238,8 @@ public class MainActivity extends FragmentActivity implements
             }
         } else if (requestCode == REQUEST_CODE_CAMERA) {
             Uri imageUri = intent.getData();
+
             if (imageUri != null) {
-                setFragmentToContainer(mMainMenuFragment);
                 uploadImage(imageUri);
             }
         }
@@ -272,7 +280,11 @@ public class MainActivity extends FragmentActivity implements
                                 }
                                 mTrophiesFragment.setAchievements(achievements);
                             }
-                            setFragmentToContainer(mMainMenuFragment);
+
+                            if (!signedIn) {
+                                signedIn = true;
+                                setFragmentToContainer(mMainMenuFragment);
+                            }
                         }
                     }
                 });
@@ -344,8 +356,6 @@ public class MainActivity extends FragmentActivity implements
         Intent intent = new Intent(this, CameraActivity.class);
         intent.putExtra("item", selectedItem);
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
-        //mCameraFragment.setSelectedItem(selectedItem);
-        //setFragmentToContainer(mCameraFragment);
     }
 
 
@@ -356,19 +366,13 @@ public class MainActivity extends FragmentActivity implements
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.fragment_container, fragment);
-            if (!(fragment instanceof MainMenuFragment)) {
+            if (!(fragment instanceof MainMenuFragment) && !(fragment instanceof SplashScreenFragment)) {
                 transaction.addToBackStack(fragmentTag);
             }
             transaction.commit();
         
 
     }
-
-    /*@Override
-    public void onImageTaken(File file) {
-        setFragmentToContainer(mSplashScreenFragment);
-        uploadImage(Uri.fromFile(file));
-    }*/
 
     public void uploadImage(Uri uri) {
         if (uri != null) {
@@ -378,8 +382,11 @@ public class MainActivity extends FragmentActivity implements
                         scaleBitmapDown(
                                 MediaStore.Images.Media.getBitmap(getContentResolver(), uri)
                         );
+
+                mResultFragment.setImage(bitmap);
+                mResultFragment.setStatus("Searching for item...");
+                setFragmentToContainer(mResultFragment);
                 callCloudVision(bitmap);
-                //mMainImage.setImageBitmap(bitmap);
             } catch (IOException e) {
                 Log.d(TAG, "Image picking failed because " + e.getMessage());
                 //Toast.makeText(this, R.string.image_picker_error, Toast.LENGTH_LONG).show();
