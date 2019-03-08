@@ -70,10 +70,27 @@ public class TrophiesFragment extends Fragment implements AdapterView.OnItemClic
         LayoutInflater inflater = getLayoutInflater();
         View layout = inflater.inflate(R.layout.achievement_toast, (ViewGroup) view.findViewById(R.id.achievement_toast_root));
 
+        String title = "???", description = "???";
+        Achievement achievement = mTrophies.getAchievement(position);
+        if (achievement.getState() == Achievement.STATE_REVEALED
+                || achievement.getState() == Achievement.STATE_UNLOCKED) {
+            title = achievement.getName();
+            description = achievement.getDescription();
+        }
+
+        ImageView trophy = layout.findViewById(R.id.achievement_toast_trophy);
+        if (/*achievement.getState() == Achievement.STATE_REVEALED
+                    || */achievement.getState() == Achievement.STATE_HIDDEN) {
+            trophy.setImageResource(R.drawable.trophy_locked);
+        } else {
+            trophy.setImageResource(R.drawable.trophy_unlocked);
+        }
+
         TextView achievementTitleTextView = layout.findViewById(R.id.achievement_toast_title);
-        achievementTitleTextView.setText(mTrophies.getAchievement(position).getName());
         TextView achievementDescriptionTextView = layout.findViewById(R.id.achievement_toast_description);
-        achievementDescriptionTextView.setText(mTrophies.getAchievement(position).getDescription());
+
+        achievementTitleTextView.setText(title);
+        achievementDescriptionTextView.setText(description);
 
         Toast toast = new Toast(getContext());
         toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, 80);
@@ -127,11 +144,11 @@ public class TrophiesFragment extends Fragment implements AdapterView.OnItemClic
             }
 
             Achievement achievement = mAchievements.get(position);
-            if (achievement.getState() == Achievement.STATE_REVEALED
-                    || achievement.getState() == Achievement.STATE_HIDDEN) {
-                imageView.setImageResource(R.drawable.trophy_shadow);
+            if (/*achievement.getState() == Achievement.STATE_REVEALED
+                    || */achievement.getState() == Achievement.STATE_HIDDEN) {
+                imageView.setImageResource(R.drawable.trophy_locked);
             } else {
-                imageView.setImageURI(achievement.getUnlockedImageUri());
+                imageView.setImageResource(R.drawable.trophy_unlocked);
             }
             return imageView;
         }
