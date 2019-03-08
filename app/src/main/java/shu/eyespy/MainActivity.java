@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import shu.eyespy.fragments.CameraFragment;
@@ -64,7 +63,6 @@ import shu.eyespy.fragments.SplashScreenFragment;
 import shu.eyespy.fragments.TrophiesFragment;
 import shu.eyespy.utilities.PackageManagerUtils;
 
-//TODO: Rearrange the drawable folder to be more organised.
 
 public class MainActivity extends FragmentActivity implements
         MainMenuFragment.Listener,
@@ -105,41 +103,41 @@ public class MainActivity extends FragmentActivity implements
     private static void generateWord()
     {
         items = new ArrayList<>();
-        items.add(new Item("Pen", Item.ItemDifficulty.EASY));
-        items.add(new Item("Keyboard", Item.ItemDifficulty.EASY));
-        items.add(new Item("Chair", Item.ItemDifficulty.EASY));
+        items.add(new Item("Pen", Item.ItemDifficulty.EASY, new String[] {"Writing implement" } ));
+        items.add(new Item("Keyboard", Item.ItemDifficulty.EASY, new String[] {"Electronic device", "Peripheral" } ));
+        items.add(new Item("Chair", Item.ItemDifficulty.EASY, new String[] {"Furniture"}));
 
-        items.add(new Item("Book", Item.ItemDifficulty.MEDIUM));
-        items.add(new Item("Plant", Item.ItemDifficulty.MEDIUM));
-        items.add(new Item("Fridge", Item.ItemDifficulty.MEDIUM));
-        items.add(new Item("Brush", Item.ItemDifficulty.MEDIUM));
+        items.add(new Item("Bottle", Item.ItemDifficulty.MEDIUM, new String[] {"Two-liter bottle", "Plastic bottle", "Water bottle", "Drinkware"}));
+        items.add(new Item("Plant", Item.ItemDifficulty.MEDIUM, new String[] {"Houseplant", "Flowerpot", "Flowering plant", "Vascular plant", "Botany", "Leaf", "Flower", "Herb"}));
+        items.add(new Item("Shoe", Item.ItemDifficulty.MEDIUM, new String[] {"Footwear", "Boot", "Cowboy Boot", "Riding Boot", "Plimsoll shoe", "Skate shoe", "Athletic shoe", "Sneakers"}));
 
-        items.add(new Item("Mouse", Item.ItemDifficulty.HARD));
-        items.add(new Item("Dog", Item.ItemDifficulty.HARD));
-        items.add(new Item("Cat", Item.ItemDifficulty.HARD));
+        items.add(new Item("Mouse", Item.ItemDifficulty.HARD, new String[] {"Electronic device", "Peripheral" }));
+        items.add(new Item("Fan", Item.ItemDifficulty.HARD, new String[] { "Mechanical fan"}));
+        items.add(new Item("Hat", Item.ItemDifficulty.HARD, new String[] {"Headgear", "Fedora", "Sun hat", "Sombrero"}));
 
     }
 
     private static Boolean searchForItem(BatchAnnotateImagesResponse response) {
-        Boolean found = false;
         StringBuilder message = new StringBuilder();
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
+
         if (labels != null) {
             for (EntityAnnotation label : labels) {
                 message.append(String.format(Locale.US, "%.3f: %s", label.getScore(), label.getDescription()));
                 message.append("\n");
-
-                if(label.getDescription().compareToIgnoreCase(selectItem.getName()) == 0)
-                {
-found = true;
-                }
             }
             Log.d(TAG, message.toString());
 
-        } else {
-            message.append("Nothing found.");
+            for (EntityAnnotation label : labels) {
+                String item = label.getDescription();
+
+                if (selectItem.getName().compareToIgnoreCase(item) == 0
+                    || selectItem.getSynonyms().contains(item)) {
+                    return true;
+                }
+            }
         }
-        return found;
+        return false;
     }
 
     @Override

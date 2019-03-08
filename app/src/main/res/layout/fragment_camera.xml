@@ -21,7 +21,6 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <!--TODO: We will have issues with long text + high difficulty views, any way round this?-->
         <LinearLayout
             android:id="@+id/show_selected_level"
             android:layout_width="match_parent"
@@ -41,22 +40,6 @@
                 android:layout_marginStart="20dp"
                 android:textColor="#FFFF"
                 android:textSize="40sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
-                android:gravity="end|center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="20dp"
-                    android:contentDescription="This is a star to show the difficulty chosen."
-                    android:src="@drawable/star_shadow" />
-            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
