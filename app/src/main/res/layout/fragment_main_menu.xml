@@ -70,7 +70,7 @@
                             android:src="@drawable/star_shadow" />
 
                         <TextView
-                            android:id="@+id/textView1"
+                            android:id="@+id/main_menu_score_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
@@ -93,7 +93,7 @@
                             android:src="@drawable/trophy_locked" />
 
                         <TextView
-                            android:id="@+id/textView3"
+                            android:id="@+id/main_menu_achievement_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"

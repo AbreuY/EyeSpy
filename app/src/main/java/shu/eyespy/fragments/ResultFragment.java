@@ -28,13 +28,13 @@ public class ResultFragment extends Fragment {
     private ImageView mImageView;
     private TextView mStatusTextView;
 
-    public void updateResultScreen(boolean result, Item.ItemDifficulty difficulty) {
+    public void updateResultScreen(boolean result, int score) {
         mView.findViewById(R.id.result_progress_layout).setVisibility(View.GONE);
         mView.findViewById(R.id.result_done_layout).setVisibility(View.VISIBLE);
 
         ((TextView) mView.findViewById(R.id.result_done_text_view))
                 .setText(result ?
-                        String.format(Locale.UK,"Congratulations, your score has increased by %d.", (difficulty.ordinal() + 1))
+                        String.format(Locale.UK,"Congratulations, your score has increased by %d.", score)
                         : "Sorry, item was not found in the image.");
     }
 

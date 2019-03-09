@@ -21,6 +21,23 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
     private Listener mListener = null;
 
     private TextView mUsernameTextView;
+    private TextView mScoreTextView;
+    private TextView mAchievementCountTextView;
+
+    private int achievementCount;
+    private long score;
+
+    public void setScore(long score) {
+        this.score = score;
+
+        updateUI();
+    }
+
+    public void setAchievementCount(int achievementCount) {
+        this.achievementCount = achievementCount;
+
+        updateUI();
+    }
 
     @Nullable
     @Override
@@ -42,6 +59,9 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
         }
 
         mUsernameTextView = mView.findViewById(R.id.main_menu_username_text_view);
+        mScoreTextView = mView.findViewById(R.id.main_menu_score_text_view);
+        mAchievementCountTextView = mView.findViewById(R.id.main_menu_achievement_text_view);
+
         updateUI();
 
         return mView;
@@ -49,6 +69,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
 
     public void setUsername(String username) {
         this.mUsername = username;
+
         updateUI();
     }
 
@@ -83,6 +104,8 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
         }
 
         mUsernameTextView.setText(mUsername);
+        mScoreTextView.setText(Long.toString(score));
+        mAchievementCountTextView.setText(Integer.toString(achievementCount));
     }
 
     public interface Listener {
