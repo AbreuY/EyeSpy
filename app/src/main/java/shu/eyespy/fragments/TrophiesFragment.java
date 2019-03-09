@@ -168,7 +168,6 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
 
         void setAchievements(List<Achievement> achievements) {
             mAchievements = achievements;
-            mAchievements.get(0).
         }
 
     }
