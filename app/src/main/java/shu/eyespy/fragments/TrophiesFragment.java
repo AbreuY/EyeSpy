@@ -81,8 +81,8 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         }
 
         ImageView trophy = layout.findViewById(R.id.achievement_toast_trophy);
-        if (/*achievement.getState() == Achievement.STATE_REVEALED
-                    || */achievement.getState() == Achievement.STATE_HIDDEN) {
+        if (achievement.getState() == Achievement.STATE_REVEALED
+                    || achievement.getState() == Achievement.STATE_HIDDEN) {
             trophy.setImageResource(R.drawable.trophy_locked);
         } else {
             trophy.setImageResource(R.drawable.trophy_unlocked);
@@ -157,8 +157,8 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
             }
 
             Achievement achievement = mAchievements.get(position);
-            if (/*achievement.getState() == Achievement.STATE_REVEALED
-                    || */achievement.getState() == Achievement.STATE_HIDDEN) {
+            if (achievement.getState() == Achievement.STATE_REVEALED
+                    || achievement.getState() == Achievement.STATE_HIDDEN) {
                 imageView.setImageResource(R.drawable.trophy_locked);
             } else {
                 imageView.setImageResource(R.drawable.trophy_unlocked);
@@ -168,6 +168,7 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
 
         void setAchievements(List<Achievement> achievements) {
             mAchievements = achievements;
+            mAchievements.get(0).
         }
 
     }

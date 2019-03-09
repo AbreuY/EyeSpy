@@ -26,10 +26,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.AchievementsClient;
 import com.google.android.gms.games.AnnotatedData;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.LeaderboardsClient;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.android.gms.games.achievement.AchievementBuffer;
+import com.google.android.gms.games.leaderboard.LeaderboardScore;
+import com.google.android.gms.games.leaderboard.LeaderboardVariant;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -69,7 +72,10 @@ import shu.eyespy.utilities.PackageManagerUtils;
 
 public class MainActivity extends FragmentActivity implements
         MainMenuFragment.Listener,
-        ItemSelectFragment.ItemSelectedCallback {
+        ItemSelectFragment.ItemSelectedCallback
+        {
+
+
 
     private static final String CLOUD_VISION_API_KEY = "AIzaSyD1-hvw0TcwQnfN0rXYHCEQWtruyl6Lmfo";
     private static final int MAX_DIMENSION = 1200;
@@ -91,6 +97,11 @@ public class MainActivity extends FragmentActivity implements
     private GoogleSignInClient mGoogleSignInClient;
     private PlayersClient mPlayersClient;
     private AchievementsClient mAchievementsClient;
+    private LeaderboardsClient mLeaderboardsClient;
+
+    private final AccomplishmentsOutbox mOutbox = new AccomplishmentsOutbox();
+
+    private long playerScore = 0;
 
     private static ArrayList<Item> items;
 
@@ -143,6 +154,38 @@ public class MainActivity extends FragmentActivity implements
             }
         }
         return false;
+    }
+
+    /*private void achievementToast(String achievement) {
+        // Only show toast if not signed in. If signed in, the standard Google Play
+        // toasts will appear, so we don't need to show our own.
+        if (!isSignedIn()) {
+            Toast.makeText(this, getString(R.string.achievement) + ": " + achievement,
+                    Toast.LENGTH_LONG).show();
+        }
+    }*/
+
+    private void pushAccomplishments() {
+        if (!isSignedIn()) {
+            // can't push to the cloud, try again later
+            return;
+        }
+
+        if (mOutbox.mGamesPlayed > 0) {
+            mAchievementsClient.unlockImmediate(getString(R.string.achievement_first_class));
+            mAchievementsClient.incrementImmediate(getString(R.string.achievement_tens_a_charm), mOutbox.mGamesPlayed);
+            mOutbox.mGamesPlayed = 0;
+        }
+
+        if (mOutbox.mScore > 0) {
+            mAchievementsClient.incrementImmediate(getString(R.string.achievement_point_novice), mOutbox.mScore);
+            mAchievementsClient.incrementImmediate(getString(R.string.achievement_point_hunter), mOutbox.mScore);
+            mAchievementsClient.incrementImmediate(getString(R.string.achievement_point_master), mOutbox.mScore);
+
+            mLeaderboardsClient.submitScoreImmediate(getString(R.string.leaderboard_scores),
+                    playerScore);
+            mOutbox.mScore = 0;
+        }
     }
 
     @Override
@@ -271,6 +314,7 @@ public class MainActivity extends FragmentActivity implements
 
         mPlayersClient = Games.getPlayersClient(this, account);
         mAchievementsClient = Games.getAchievementsClient(this, account);
+        mLeaderboardsClient = Games.getLeaderboardsClient(this, account);
 
         mSplashScreenFragment.setStatus("Retrieving player information...", View.VISIBLE);
         Log.d(TAG, "onConnected(): Retrieving player information...");
@@ -287,6 +331,19 @@ public class MainActivity extends FragmentActivity implements
                     }
                 });
 
+        mLeaderboardsClient.loadCurrentPlayerLeaderboardScore(getString(R.string.leaderboard_scores),
+                LeaderboardVariant.TIME_SPAN_ALL_TIME,
+                LeaderboardVariant.COLLECTION_PUBLIC)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        LeaderboardScore score = task.getResult().get();
+                        if (score != null) {
+                            playerScore = score.getRawScore();
+                        }
+                        mMainMenuFragment.setScore(playerScore);
+                    }
+                });
+
         mAchievementsClient.load(true)
                 .addOnCompleteListener(new OnCompleteListener<AnnotatedData<AchievementBuffer>>() {
                     @Override
@@ -296,10 +353,18 @@ public class MainActivity extends FragmentActivity implements
                             if (achievementsBuffer != null) {
                                 Log.d(TAG, "onConnected(): Achievement count = " + Integer.toString(achievementsBuffer.getCount()));
                                 List<Achievement> achievements = new ArrayList<>();
+                                int achievementCount = 0;
                                 for (int i = 0; i < achievementsBuffer.getCount(); i++) {
-                                    achievements.add(achievementsBuffer.get(i));
+                                    Achievement achievement = achievementsBuffer.get(i);
+
+                                    achievements.add(achievement);
+
+                                    if (achievement.getState() == Achievement.STATE_UNLOCKED) {
+                                        achievementCount++;
+                                    }
                                 }
                                 mTrophiesFragment.setAchievements(achievements);
+                                mMainMenuFragment.setAchievementCount(achievementCount);
                             }
 
                             if (!signedIn) {
@@ -309,6 +374,10 @@ public class MainActivity extends FragmentActivity implements
                         }
                     }
                 });
+
+        if (!mOutbox.isEmpty()) {
+            pushAccomplishments();
+        }
     }
 
     private void onDisconnected() {
@@ -524,7 +593,22 @@ public class MainActivity extends FragmentActivity implements
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 
-    private static class LableDetectionTask extends AsyncTask<Object, Void, Boolean> {
+    public void onGameFinished(boolean success, int score) {
+        mResultFragment.updateResultScreen(success, score);
+
+        mOutbox.mGamesPlayed++;
+        if (success) {
+            playerScore += score;
+            mOutbox.mScore += score;
+        }
+
+        mMainMenuFragment.setScore(playerScore);
+
+        pushAccomplishments();
+    }
+
+    public static class LableDetectionTask extends AsyncTask<Object, Void, Boolean>  {
+
         private final WeakReference<MainActivity> mActivityWeakReference;
 
         private Vision.Images.Annotate mRequest;
@@ -553,7 +637,8 @@ public class MainActivity extends FragmentActivity implements
             MainActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
                 Log.d(TAG,result.toString());
-                activity.mResultFragment.updateResultScreen(result, selectItem.getDifficulty());
+
+                activity.onGameFinished(result, selectItem.getDifficulty().ordinal() + 1);
             }
         }
     }

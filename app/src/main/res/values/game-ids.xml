@@ -11,7 +11,7 @@ Save this file as res/values/games-ids.xml in your project.
     <!-- achievement First Class -->
     <string name="achievement_first_class" translatable="false">CggI9O79vlIQAhAB</string>
     <!-- achievement Ten's a Charm -->
-    <string name="achievement_tens_a_charm" translatable="false">CggI9O79vlIQAhAC</string>
+    <string name="achievement_tens_a_charm" translatable="false">CggI9O79vlIQAhAI</string>
     <!-- achievement Point Novice -->
     <string name="achievement_point_novice" translatable="false">CggI9O79vlIQAhAD</string>
     <!-- achievement Point Hunter -->
@@ -20,4 +20,5 @@ Save this file as res/values/games-ids.xml in your project.
     <string name="achievement_point_master" translatable="false">CggI9O79vlIQAhAF</string>
     <!-- leaderboard Scores -->
     <string name="leaderboard_scores" translatable="false">CggI9O79vlIQAhAG</string>
+
 </resources>
