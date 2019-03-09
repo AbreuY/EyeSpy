@@ -2,6 +2,8 @@ package shu.eyespy;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.widget.ArrayAdapter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,29 +11,38 @@ import java.util.List;
 public class Item implements Parcelable {
 
 
-    private String id;
+    private int id;
     private String name;
     private ItemDifficulty difficulty;
-    private List<String> synonyms;
+    private ArrayList<String> synonyms;
 
     public Item (Parcel in) {
         readFromParcel(in);
     }
 
-    public Item(String name, ItemDifficulty difficulty) {
+    public Item(int id) {
+        this.id = id;
+    }
+
+    public Item(int id, String name, ItemDifficulty difficulty) {
         this.synonyms = new ArrayList<>();
 
+        this.id = id;
         this.name = name;
         this.difficulty = difficulty;
     }
 
-    public Item(String name, ItemDifficulty difficulty, String[] synonyms) {
+    public Item(String name, ItemDifficulty difficulty, ArrayList synonyms) {
         this.name = name;
         this.difficulty = difficulty;
-        this.synonyms = Arrays.asList(synonyms);
+        this.synonyms = synonyms;
     }
 
-    public List<String> getSynonyms() {
+    public void setSynonyms(ArrayList<String> synonyms) {
+        this.synonyms = synonyms;
+    }
+
+    public ArrayList<String> getSynonyms() {
         return synonyms;
     }
 
@@ -51,7 +62,7 @@ public class Item implements Parcelable {
         return name;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -66,13 +77,13 @@ public class Item implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
+        dest.writeInt(id);
         dest.writeString(name);
         dest.writeInt(difficulty.ordinal());
     }
 
     private void readFromParcel(Parcel in) {
-        id = in.readString();
+        id = in.readInt();
         name = in.readString();
         difficulty = ItemDifficulty.values()[in.readInt()];
     }
@@ -81,5 +92,15 @@ public class Item implements Parcelable {
         EASY,
         MEDIUM,
         HARD
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", difficulty=" + difficulty +
+                ", synonyms=" + synonyms +
+                '}';
     }
 }

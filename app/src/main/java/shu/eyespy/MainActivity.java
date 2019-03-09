@@ -2,6 +2,7 @@ package shu.eyespy;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -100,8 +101,10 @@ public class MainActivity extends FragmentActivity implements
     private LeaderboardsClient mLeaderboardsClient;
 
     private final AccomplishmentsOutbox mOutbox = new AccomplishmentsOutbox();
+    private static ItemAdapter mItemDatabaseHelper;
 
-    private long playerScore = 0;
+
+            private long playerScore = 0;
 
     private static ArrayList<Item> items;
 
@@ -116,24 +119,14 @@ public class MainActivity extends FragmentActivity implements
         return false;
     }
 
-    private static void generateWord()
-    {
-        items = new ArrayList<>();
-        items.add(new Item("Pen", Item.ItemDifficulty.EASY, new String[] {"Writing implement" } ));
-        items.add(new Item("Keyboard", Item.ItemDifficulty.EASY, new String[] {"Electronic device", "Peripheral" } ));
-        items.add(new Item("Chair", Item.ItemDifficulty.EASY, new String[] {"Furniture"}));
+            @Override
+            protected void onDestroy() {
+                super.onDestroy();
 
-        items.add(new Item("Bottle", Item.ItemDifficulty.MEDIUM, new String[] {"Two-liter bottle", "Plastic bottle", "Water bottle", "Drinkware"}));
-        items.add(new Item("Plant", Item.ItemDifficulty.MEDIUM, new String[] {"Houseplant", "Flowerpot", "Flowering plant", "Vascular plant", "Botany", "Leaf", "Flower", "Herb"}));
-        items.add(new Item("Shoe", Item.ItemDifficulty.MEDIUM, new String[] {"Footwear", "Boot", "Cowboy Boot", "Riding Boot", "Plimsoll shoe", "Skate shoe", "Athletic shoe", "Sneakers"}));
+                mItemDatabaseHelper.close();
+            }
 
-        items.add(new Item("Mouse", Item.ItemDifficulty.HARD, new String[] {"Electronic device", "Peripheral" }));
-        items.add(new Item("Fan", Item.ItemDifficulty.HARD, new String[] { "Mechanical fan"}));
-        items.add(new Item("Hat", Item.ItemDifficulty.HARD, new String[] {"Headgear", "Fedora", "Sun hat", "Sombrero"}));
-
-    }
-
-    private static Boolean searchForItem(BatchAnnotateImagesResponse response) {
+            private static Boolean searchForItem(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder();
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
 
@@ -193,8 +186,6 @@ public class MainActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        generateWord();
-
         mSplashScreenFragment = new SplashScreenFragment();
         mMainMenuFragment = new MainMenuFragment();
         mTrophiesFragment = new TrophiesFragment();
@@ -203,6 +194,8 @@ public class MainActivity extends FragmentActivity implements
 
         mMainMenuFragment.setListener(this);
         mItemSelectFragment.setSelectedItemCallback(this);
+
+        mItemDatabaseHelper = new ItemAdapter(this);
 
         setFragmentToContainer(mSplashScreenFragment);
 
@@ -398,23 +391,11 @@ public class MainActivity extends FragmentActivity implements
         Log.d(TAG, "onStartGameRequested(): Sign out requested.");
 
         ArrayList<Item> threeItems = new ArrayList<>();
-        Random random = new Random();
-
-        List<Item> easy = items.stream()
-                .filter(item -> item.getDifficulty().equals(Item.ItemDifficulty.EASY))
-                .collect(Collectors.toList());
-        List<Item> med = items.stream()
-                .filter(item -> item.getDifficulty().equals(Item.ItemDifficulty.MEDIUM))
-                .collect(Collectors.toList());
-        List<Item> hard = items.stream()
-                .filter(item -> item.getDifficulty().equals(Item.ItemDifficulty.HARD))
-                .collect(Collectors.toList());
-
-
-        threeItems.add(easy.get(random.nextInt(easy.size())));
-        threeItems.add(med.get(random.nextInt(med.size())));
-        threeItems.add(hard.get(random.nextInt(hard.size())));
+        threeItems.add(mItemDatabaseHelper.getRandomItem(Item.ItemDifficulty.EASY));
+        threeItems.add(mItemDatabaseHelper.getRandomItem(Item.ItemDifficulty.MEDIUM));
+        threeItems.add(mItemDatabaseHelper.getRandomItem(Item.ItemDifficulty.HARD));
         mItemSelectFragment.setItems(threeItems);
+
         setFragmentToContainer(mItemSelectFragment);
     }
 
