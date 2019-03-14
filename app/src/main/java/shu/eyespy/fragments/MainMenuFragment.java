@@ -86,7 +86,11 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
                 mListener.onProfilePageRequested();
                 break;
             case R.id.main_menu_play_button:
-                mListener.onStartGameRequested();
+                try {
+                    mListener.onStartGameRequested();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.main_menu_trophies_button:
                 mListener.onShowAchievementsRequested();
@@ -113,7 +117,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
     public interface Listener {
         void onProfilePageRequested();
 
-        void onStartGameRequested();
+        void onStartGameRequested() throws Exception;
 
         void onShowAchievementsRequested();
 

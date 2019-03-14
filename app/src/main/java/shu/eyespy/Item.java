@@ -5,11 +5,14 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class Item implements Parcelable {
 
     private int id;
-    private String name;
+    private HashMap<String, String> name;
     private ItemDifficulty difficulty;
     private ArrayList<String> synonyms;
 
@@ -17,17 +20,11 @@ public class Item implements Parcelable {
         readFromParcel(in);
     }
 
-
-    Item(int id, String name, ItemDifficulty difficulty) {
-        this.synonyms = new ArrayList<>();
-
+    Item(int id, HashMap<String, String> name, ArrayList<String> synonyms, ItemDifficulty difficulty) {
         this.id = id;
         this.name = name;
-        this.difficulty = difficulty;
-    }
-
-    void setSynonyms(ArrayList<String> synonyms) {
         this.synonyms = synonyms;
+        this.difficulty = difficulty;
     }
 
     ArrayList<String> getSynonyms() {
@@ -46,8 +43,12 @@ public class Item implements Parcelable {
         }
     };
 
-    public String getName() {
-        return name;
+    public String getName(String iso2Code) {
+        return Optional.ofNullable(name.get(iso2Code)).orElse(getNameEn());
+    }
+
+    public String getNameEn() {
+        return name.get("EN");
     }
 
     public int getId() {
@@ -66,13 +67,23 @@ public class Item implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
-        dest.writeString(name);
+        dest.writeInt(name.size());
+        for(Map.Entry<String,String> e : name.entrySet()){
+            dest.writeString(e.getKey());
+            dest.writeString(e.getValue());
+        }
         dest.writeInt(difficulty.ordinal());
     }
 
     private void readFromParcel(Parcel in) {
         id = in.readInt();
-        name = in.readString();
+
+        int size = in.readInt();
+        name = new HashMap<>(size);
+        for(int i = 0; i < size; i++){
+            name.put(in.readString(), in.readString());
+        }
+
         difficulty = ItemDifficulty.values()[in.readInt()];
     }
 

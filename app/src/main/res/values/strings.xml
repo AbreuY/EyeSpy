@@ -1,8 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">EyeSpy</string>
+    <string name="app_name" translatable="false">EyeSpy</string>
 
     <!-- MAIN MENU -->
-    <string name="main_menu_options_button">OPTIONS</string>
+    <string name="main_menu_options_button">LOG OUT</string>
     <string name="main_menu_rankings_button">RANKINGS</string>
     <string name="main_menu_trophies_button">TROPHIES</string>
     <string name="main_menu_play_button">PLAY</string>
@@ -12,19 +13,34 @@
     <string name="splash_screen_error_signing_in">Error signing in: %s</string>
     <string name="splash_screen_retrieving_player_info">Retrieving player information…</string>
 
+    <!-- LEVEL SELECT -->
+    <string name="level_select_select_item">SELECT ITEM</string>
+    <string name="level_select_easy_difficulty">Easy difficulty</string>
+    <string name="level_select_medium_difficulty">Medium difficulty</string>
+    <string name="level_select_hard_difficulty">Hard difficulty</string>
+
     <!-- RESULT FRAGMENT -->
+    <string name="result_main_menu">MAIN MENU</string>
     <string name="result_correct_answer">Congratulations, your score has increased by %d.</string>
     <string name="result_wrong_item">Sorry, item was not found in the image.</string>
+    <string name="results_title">Results</string>
+    <string name="result_image_taken">This is the image that has been taken</string>
+    <string name="result_searching">Searching for item…</string>
 
     <!-- TROPHIES FRAGMENT -->
     <string name="trophies_unknown" translatable="false">\???</string>
 
     <!-- CONTENT DESCRIPTIONS -->
     <string name="players_avatar_content_desc">This contains the image for players avatar.</string>
+    <string name="achievement_toast_trophy_description">Trophy toast shown.</string>
+    <string name="camera_button_description">This is a button of a camera to take photos with.</string>
+
 
     <!-- PERMISSIONS REASONING -->
     <string name="request_camera_permission">This application requires the camera permission.</string>
 
+
     <!-- API ISSUES -->
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+
 </resources>

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 class ItemAdapter {
 
@@ -43,35 +44,63 @@ class ItemAdapter {
         itemDatabaseHelper.close();
     }
 
-    Item getRandomItem(Item.ItemDifficulty difficulty) {
-        @SuppressLint("DefaultLocale") final String itemIndexSQL = String.format("SELECT _id, name FROM Item WHERE difficulty = %d ORDER BY RANDOM() LIMIT 1", difficulty.ordinal());
-        Item selectedItem;
+    Item getRandomItem(Item.ItemDifficulty difficulty) throws Exception {
+        final int index = getItemID(difficulty);
+        final HashMap<String, String> names = getItemNames(index);
+        final ArrayList<String> synonyms = getItemSynonyms(index);
 
+        return new Item(index, names, synonyms, difficulty);
+    }
+
+    private int getItemID(Item.ItemDifficulty difficulty) throws Exception {
+        @SuppressLint("DefaultLocale") final String itemIndexSQL = String.format("SELECT _id FROM ItemDifficulty WHERE difficulty = %d ORDER BY RANDOM() LIMIT 1", difficulty.ordinal());
         Cursor itemSelectCursor = mDatabase.rawQuery(itemIndexSQL, null);
+        int itemIndex = 0;
         if (itemSelectCursor != null) {
             itemSelectCursor.moveToNext();
-            selectedItem = new Item(itemSelectCursor.getInt(0), itemSelectCursor.getString(1), difficulty);
+            itemIndex = itemSelectCursor.getInt(0);
             itemSelectCursor.close();
+
+            if (itemIndex == -1) {
+                throw new Exception("Item index could not be selected.");
+            }
+            return itemIndex;
         } else {
             throw new SQLException("Did not find an item.");
         }
+    }
 
+    private HashMap<String, String> getItemNames(int index) {
+        @SuppressLint("DefaultLocale") final String itemNameSQL = String.format("SELECT isoCode, name FROM Item WHERE itemId = %d", index);
+        Cursor itemSelectCursor = mDatabase.rawQuery(itemNameSQL, null);
+        if (itemSelectCursor != null) {
+            HashMap<String, String> names = new HashMap<>();
+            while (itemSelectCursor.moveToNext()) {
+                names.put(itemSelectCursor.getString(0), itemSelectCursor.getString(1));
+            }
+            itemSelectCursor.close();
+            Log.d(TAG, names.toString());
+            return names;
+        } else {
+            throw new SQLException("Did not find an item.");
+        }
+    }
+
+    private ArrayList<String> getItemSynonyms(int id) {
         @SuppressLint("DefaultLocale") final String itemSelectSQL = String.format(
-                "SELECT name FROM Synonyms WHERE item_id = %d",
-                selectedItem.getId()
+                "SELECT name FROM Synonyms WHERE itemId = %d",
+                id
         );
         Cursor itemInformationCursor = mDatabase.rawQuery(itemSelectSQL, null);
         if (itemInformationCursor != null) {
             ArrayList<String> synonyms = new ArrayList<>();
-            while (itemSelectCursor.moveToNext()) {
-                synonyms.add(itemSelectCursor.getString(0));
+            while (itemInformationCursor.moveToNext()) {
+                synonyms.add(itemInformationCursor.getString(0));
             }
             itemInformationCursor.close();
-            selectedItem.setSynonyms(synonyms);
+            return synonyms;
         } else {
             throw new SQLException("Did not find an synonyms.");
         }
-
-        return selectedItem;
     }
 }

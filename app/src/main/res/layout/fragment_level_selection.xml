@@ -16,7 +16,7 @@
         android:layout_marginEnd="55dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/header_button_template"
-        android:text="pick one"
+        android:text="@string/level_select_select_item"
         android:textColor="#FFFF"
         android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -51,13 +51,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingBottom="10dp"
+            android:contentDescription="@string/level_select_easy_difficulty">
 
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:contentDescription="Difficulty Star"
-                android:src="@drawable/star_shadow" />
+                android:src="@drawable/star_shadow"
+                android:contentDescription="@null"/>
 
         </android.support.v7.widget.LinearLayoutCompat>
 
@@ -91,21 +92,22 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingBottom="10dp"
+            android:contentDescription="@string/level_select_medium_difficulty">
 
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginEnd="10dp"
-                android:contentDescription="Difficulty Star"
-                android:src="@drawable/star_shadow" />
+                android:src="@drawable/star_shadow"
+                android:contentDescription="@null" />
 
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
-                android:contentDescription="Difficulty Star"
-                android:src="@drawable/star_shadow" />
+                android:src="@drawable/star_shadow"
+                android:contentDescription="@null" />
 
         </android.support.v7.widget.LinearLayoutCompat>
 
@@ -139,13 +141,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingTop="10dp"
-            android:paddingBottom="10dp">
+            android:paddingBottom="10dp"
+            android:contentDescription="@string/level_select_hard_difficulty">
 
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginEnd="10dp"
-                android:contentDescription="Difficulty Star"
+                android:contentDescription="@null"
                 android:src="@drawable/star_shadow" />
 
             <ImageView
@@ -153,14 +156,14 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:contentDescription="Difficulty Star"
+                android:contentDescription="@null"
                 android:src="@drawable/star_shadow" />
 
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="10dp"
-                android:contentDescription="Difficulty Star"
+                android:contentDescription="@null"
                 android:src="@drawable/star_shadow" />
 
 
