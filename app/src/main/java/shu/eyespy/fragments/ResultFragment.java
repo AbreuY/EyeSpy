@@ -1,12 +1,8 @@
 package shu.eyespy.fragments;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.Image;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,7 +14,6 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-import shu.eyespy.Item;
 import shu.eyespy.R;
 
 //TODO: Change to BaseFragment and don't allow back space.
@@ -34,8 +29,8 @@ public class ResultFragment extends Fragment {
 
         ((TextView) mView.findViewById(R.id.result_done_text_view))
                 .setText(result ?
-                        String.format(Locale.UK,"Congratulations, your score has increased by %d.", score)
-                        : "Sorry, item was not found in the image.");
+                        String.format(Locale.UK, getString(R.string.result_correct_answer), score)
+                        : getString(R.string.result_wrong_item));
     }
 
     private Bitmap bitmap;

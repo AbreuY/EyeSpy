@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -38,12 +37,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
-import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -70,7 +67,6 @@ public class CameraActivity extends AppCompatActivity
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static final int REQUEST_CAMERA_PERMISSION = 1;
     private static final String FRAGMENT_DIALOG = "dialog";
-    private TextView mItemTextView;
 
     /**
      * Camera state: Showing camera preview.
@@ -369,15 +365,6 @@ public class CameraActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Shows a {@link Toast} on the UI thread.
-     *
-     * @param text The message to show
-     */
-    private void showToast(final String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -432,6 +419,7 @@ public class CameraActivity extends AppCompatActivity
     private void setUpCameraOutputs(int width, int height) {
         CameraManager manager = (CameraManager) this.getSystemService(Context.CAMERA_SERVICE);
         try {
+            assert manager != null;
             for (String cameraId : manager.getCameraIdList()) {
                 CameraCharacteristics characteristics
                         = manager.getCameraCharacteristics(cameraId);
@@ -550,6 +538,7 @@ public class CameraActivity extends AppCompatActivity
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
+            assert manager != null;
             manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
@@ -657,7 +646,7 @@ public class CameraActivity extends AppCompatActivity
                         @Override
                         public void onConfigureFailed(
                                 @NonNull CameraCaptureSession cameraCaptureSession) {
-                            showToast("Failed");
+                            Log.e(TAG, "Failed to configure camera device.");
                         }
                     }, null
             );
@@ -849,7 +838,7 @@ public class CameraActivity extends AppCompatActivity
 
         Item selectedItem = getIntent().getParcelableExtra("item");
 
-        mItemTextView = findViewById(R.id.camera_item_text_view);
+        TextView mItemTextView = findViewById(R.id.camera_item_text_view);
         mTextureView = findViewById(R.id.texture);
 
         findViewById(R.id.takePicture).setOnClickListener(this);
@@ -892,13 +881,12 @@ public class CameraActivity extends AppCompatActivity
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Activity activity = getActivity();
+            assert getArguments() != null;
             return new AlertDialog.Builder(activity)
                     .setMessage(getArguments().getString(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            activity.finish();
-                        }
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                        assert activity != null;
+                        activity.finish();
                     })
                     .create();
         }
@@ -916,21 +904,17 @@ public class CameraActivity extends AppCompatActivity
             final Fragment parent = getParentFragment();
             return new AlertDialog.Builder(getActivity())
                     .setMessage(R.string.request_camera_permission)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            parent.requestPermissions(new String[]{Manifest.permission.CAMERA},
-                                    REQUEST_CAMERA_PERMISSION);
-                        }
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        assert parent != null;
+                        parent.requestPermissions(new String[]{Manifest.permission.CAMERA},
+                                REQUEST_CAMERA_PERMISSION);
                     })
                     .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Activity activity = parent.getActivity();
-                                    if (activity != null) {
-                                        activity.finish();
-                                    }
+                            (dialog, which) -> {
+                                assert parent != null;
+                                Activity activity = parent.getActivity();
+                                if (activity != null) {
+                                    activity.finish();
                                 }
                             })
                     .create();

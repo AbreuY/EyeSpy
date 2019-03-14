@@ -1,6 +1,6 @@
 package shu.eyespy;
 
-public class AccomplishmentsOutbox {
+class AccomplishmentsOutbox {
     int mScore = 0;
     int mGamesPlayed = 0;
 

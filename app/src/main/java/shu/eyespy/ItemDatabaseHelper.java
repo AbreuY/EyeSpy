@@ -59,8 +59,7 @@ public class ItemDatabaseHelper extends SQLiteOpenHelper {
         return (new File(mDatabasePath.concat(DATABASE_NAME))).exists();
     }
 
-    private void copyDatabase() throws IOException
-    {
+    private void copyDatabase() throws IOException {
         Log.d(TAG, String.format("copyDatabase: Attempting to copy %s.", DATABASE_NAME));
 
         InputStream mInput = mContext.getAssets().open(DATABASE_NAME);

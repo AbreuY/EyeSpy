@@ -1,15 +1,30 @@
 <resources>
     <string name="app_name">EyeSpy</string>
 
-    <string name="players_avatar_content_desc">This contains the image for players avatar.</string>
+    <!-- MAIN MENU -->
     <string name="main_menu_options_button">OPTIONS</string>
     <string name="main_menu_rankings_button">RANKINGS</string>
-    <string name="main_menu_trophies_button">TROPHIES</string> <!-- TODO: change this to a better name, as used in more than one place. -->
+    <string name="main_menu_trophies_button">TROPHIES</string>
     <string name="main_menu_play_button">PLAY</string>
 
-    <string name="sign_in_other_error">There was an issue with sign in.  Please try again.</string>
+    <!-- SPLASH SCREEN -->
+    <string name="splash_screen_attempting_sign_in">Attempting sign in…</string>
+    <string name="splash_screen_error_signing_in">Error signing in: %s</string>
+    <string name="splash_screen_retrieving_player_info">Retrieving player information…</string>
 
-    <string name="request_camera_permission">This sample needs camera permission.</string>
+    <!-- RESULT FRAGMENT -->
+    <string name="result_correct_answer">Congratulations, your score has increased by %d.</string>
+    <string name="result_wrong_item">Sorry, item was not found in the image.</string>
+
+    <!-- TROPHIES FRAGMENT -->
+    <string name="trophies_unknown" translatable="false">\???</string>
+
+    <!-- CONTENT DESCRIPTIONS -->
+    <string name="players_avatar_content_desc">This contains the image for players avatar.</string>
+
+    <!-- PERMISSIONS REASONING -->
+    <string name="request_camera_permission">This application requires the camera permission.</string>
+
+    <!-- API ISSUES -->
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
-    <string name="title_activity_splash_screen">SplashScreenActivity</string>
 </resources>

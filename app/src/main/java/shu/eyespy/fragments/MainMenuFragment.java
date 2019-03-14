@@ -1,5 +1,6 @@
 package shu.eyespy.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -98,6 +99,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void updateUI() {
         if (mView == null) {
             return;

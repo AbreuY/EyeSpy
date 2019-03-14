@@ -2,29 +2,23 @@ package shu.eyespy;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.ArrayAdapter;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Item implements Parcelable {
-
 
     private int id;
     private String name;
     private ItemDifficulty difficulty;
     private ArrayList<String> synonyms;
 
-    public Item (Parcel in) {
+    private Item(Parcel in) {
         readFromParcel(in);
     }
 
-    public Item(int id) {
-        this.id = id;
-    }
 
-    public Item(int id, String name, ItemDifficulty difficulty) {
+    Item(int id, String name, ItemDifficulty difficulty) {
         this.synonyms = new ArrayList<>();
 
         this.id = id;
@@ -32,17 +26,11 @@ public class Item implements Parcelable {
         this.difficulty = difficulty;
     }
 
-    public Item(String name, ItemDifficulty difficulty, ArrayList synonyms) {
-        this.name = name;
-        this.difficulty = difficulty;
+    void setSynonyms(ArrayList<String> synonyms) {
         this.synonyms = synonyms;
     }
 
-    public void setSynonyms(ArrayList<String> synonyms) {
-        this.synonyms = synonyms;
-    }
-
-    public ArrayList<String> getSynonyms() {
+    ArrayList<String> getSynonyms() {
         return synonyms;
     }
 
@@ -66,7 +54,7 @@ public class Item implements Parcelable {
         return id;
     }
 
-    public ItemDifficulty getDifficulty() {
+    ItemDifficulty getDifficulty() {
         return difficulty;
     }
 
@@ -94,6 +82,7 @@ public class Item implements Parcelable {
         HARD
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Item{" +

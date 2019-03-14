@@ -2,13 +2,11 @@ package shu.eyespy;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -25,18 +23,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.games.AchievementsClient;
-import com.google.android.gms.games.AnnotatedData;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.LeaderboardsClient;
-import com.google.android.gms.games.Player;
 import com.google.android.gms.games.PlayersClient;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.android.gms.games.achievement.AchievementBuffer;
 import com.google.android.gms.games.leaderboard.LeaderboardScore;
 import com.google.android.gms.games.leaderboard.LeaderboardVariant;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -52,15 +45,12 @@ import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 import shu.eyespy.fragments.BaseFragment;
 import shu.eyespy.fragments.ItemSelectFragment;
@@ -73,18 +63,14 @@ import shu.eyespy.utilities.PackageManagerUtils;
 
 public class MainActivity extends FragmentActivity implements
         MainMenuFragment.Listener,
-        ItemSelectFragment.ItemSelectedCallback
-        {
+        ItemSelectFragment.ItemSelectedCallback {
 
-
-
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final String CLOUD_VISION_API_KEY = "AIzaSyD1-hvw0TcwQnfN0rXYHCEQWtruyl6Lmfo";
-    private static final int MAX_DIMENSION = 1200;
     private static final String ANDROID_CERT_HEADER = "X-Android-Cert";
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";
     private static final int MAX_LABEL_RESULTS = 10;
-
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int MAX_DIMENSION = 1200;
     private static final int REQUEST_CODE_SIGN_IN = 9001;
     private static final int REQUEST_CODE_CAMERA = 9002;
     private static final int REQUEST_CODE_LEADERBOARD = 9003;
@@ -103,30 +89,17 @@ public class MainActivity extends FragmentActivity implements
     private final AccomplishmentsOutbox mOutbox = new AccomplishmentsOutbox();
     private static ItemAdapter mItemDatabaseHelper;
 
+    private long playerScore = 0;
+    private boolean signedIn = false;
 
-            private long playerScore = 0;
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
-    private static ArrayList<Item> items;
-
-    public boolean signedIn = false;
-
-    public static boolean isFragmentInBackstack(final FragmentManager fragmentManager, final String fragmentTagName) {
-        for (int entry = 0; entry < fragmentManager.getBackStackEntryCount(); entry++) {
-            if (fragmentTagName.equals(fragmentManager.getBackStackEntryAt(entry).getName())) {
-                return true;
-            }
-        }
-        return false;
+        mItemDatabaseHelper.close();
     }
 
-            @Override
-            protected void onDestroy() {
-                super.onDestroy();
-
-                mItemDatabaseHelper.close();
-            }
-
-            private static Boolean searchForItem(BatchAnnotateImagesResponse response) {
+    private static Boolean searchForItem(BatchAnnotateImagesResponse response) {
         StringBuilder message = new StringBuilder();
         List<EntityAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
 
@@ -141,7 +114,7 @@ public class MainActivity extends FragmentActivity implements
                 String item = label.getDescription();
 
                 if (selectItem.getName().compareToIgnoreCase(item) == 0
-                    || selectItem.getSynonyms().contains(item)) {
+                        || selectItem.getSynonyms().contains(item)) {
                     return true;
                 }
             }
@@ -149,18 +122,8 @@ public class MainActivity extends FragmentActivity implements
         return false;
     }
 
-    /*private void achievementToast(String achievement) {
-        // Only show toast if not signed in. If signed in, the standard Google Play
-        // toasts will appear, so we don't need to show our own.
-        if (!isSignedIn()) {
-            Toast.makeText(this, getString(R.string.achievement) + ": " + achievement,
-                    Toast.LENGTH_LONG).show();
-        }
-    }*/
-
     private void pushAccomplishments() {
         if (!isSignedIn()) {
-            // can't push to the cloud, try again later
             return;
         }
 
@@ -211,11 +174,11 @@ public class MainActivity extends FragmentActivity implements
             List fragmentList = getSupportFragmentManager().getFragments();
 
             boolean handled = false;
-            for(Object f : fragmentList) {
-                if(f instanceof BaseFragment) {
-                    handled = ((BaseFragment)f).onBackPressed();
+            for (Object f : fragmentList) {
+                if (f instanceof BaseFragment) {
+                    handled = ((BaseFragment) f).onBackPressed();
 
-                    if(handled) {
+                    if (handled) {
                         break;
                     }
                 }
@@ -245,27 +208,24 @@ public class MainActivity extends FragmentActivity implements
     private void signInSilently() {
         Log.d(TAG, "signInSilently(): Attempting silent sign in.");
 
-        mSplashScreenFragment.setStatus("Attempting sign in...", View.VISIBLE);
+        mSplashScreenFragment.setStatus(getString(R.string.splash_screen_attempting_sign_in), View.VISIBLE);
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
         mGoogleSignInClient.silentSignIn().addOnCompleteListener(this,
-                new OnCompleteListener<GoogleSignInAccount>() {
-                    @Override
-                    public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
-                        if (task.isSuccessful()) {
-                            onConnected(task.getResult());
-                        } else {
-                            Log.d(TAG, "silentSignIn(): failed sign in, requesting account prompt.");
+                task -> {
+                    if (task.isSuccessful()) {
+                        onConnected(task.getResult());
+                    } else {
+                        Log.d(TAG, "silentSignIn(): failed sign in, requesting account prompt.");
 
-                            Intent intent = mGoogleSignInClient.getSignInIntent();
-                            startActivityForResult(intent, REQUEST_CODE_SIGN_IN);
-                        }
+                        Intent intent = mGoogleSignInClient.getSignInIntent();
+                        startActivityForResult(intent, REQUEST_CODE_SIGN_IN);
                     }
                 });
     }
 
     private void startSignInIntent() {
-        mSplashScreenFragment.setStatus("Attempting to sign in...", View.VISIBLE);
+        mSplashScreenFragment.setStatus(getString(R.string.splash_screen_attempting_sign_in), View.VISIBLE);
 
         GoogleSignInClient signInClient = GoogleSignIn.getClient(this,
                 GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
@@ -286,13 +246,14 @@ public class MainActivity extends FragmentActivity implements
             } else {
                 final String errorMessage = result.getStatus().getStatusMessage();
 
-                mSplashScreenFragment.setStatus("Error signing in: " + errorMessage, View.VISIBLE);
+                mSplashScreenFragment.setStatus(String.format(Locale.UK, getString(R.string.splash_screen_error_signing_in), errorMessage), View.VISIBLE);
                 Log.d(TAG, "onActivityResult(): errorCode = " + result.getStatus().getStatusCode());
 
                 onDisconnected();
             }
         } else if (requestCode == REQUEST_CODE_CAMERA) {
-            if(resultCode == Activity.RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
+                assert intent != null;
                 Uri imageUri = intent.getData();
 
                 if (imageUri != null) {
@@ -309,18 +270,15 @@ public class MainActivity extends FragmentActivity implements
         mAchievementsClient = Games.getAchievementsClient(this, account);
         mLeaderboardsClient = Games.getLeaderboardsClient(this, account);
 
-        mSplashScreenFragment.setStatus("Retrieving player information...", View.VISIBLE);
+        mSplashScreenFragment.setStatus(getString(R.string.splash_screen_retrieving_player_info), View.VISIBLE);
         Log.d(TAG, "onConnected(): Retrieving player information...");
 
         mPlayersClient.getCurrentPlayer()
-                .addOnCompleteListener(new OnCompleteListener<Player>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Player> task) {
-                        if (task.isSuccessful()) {
-                            final String username = Objects.requireNonNull(task.getResult()).getDisplayName();
-                            mMainMenuFragment.setUsername(username);
-                            Log.d(TAG, "onConnected(): Username = " + username);
-                        }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        final String username = Objects.requireNonNull(task.getResult()).getDisplayName();
+                        mMainMenuFragment.setUsername(username);
+                        Log.d(TAG, "onConnected(): Username = " + username);
                     }
                 });
 
@@ -329,7 +287,7 @@ public class MainActivity extends FragmentActivity implements
                 LeaderboardVariant.COLLECTION_PUBLIC)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        LeaderboardScore score = task.getResult().get();
+                        LeaderboardScore score = Objects.requireNonNull(task.getResult()).get();
                         if (score != null) {
                             playerScore = score.getRawScore();
                         }
@@ -338,32 +296,29 @@ public class MainActivity extends FragmentActivity implements
                 });
 
         mAchievementsClient.load(true)
-                .addOnCompleteListener(new OnCompleteListener<AnnotatedData<AchievementBuffer>>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AnnotatedData<AchievementBuffer>> task) {
-                        if (task.isSuccessful()) {
-                            AchievementBuffer achievementsBuffer = task.getResult().get();
-                            if (achievementsBuffer != null) {
-                                Log.d(TAG, "onConnected(): Achievement count = " + Integer.toString(achievementsBuffer.getCount()));
-                                List<Achievement> achievements = new ArrayList<>();
-                                int achievementCount = 0;
-                                for (int i = 0; i < achievementsBuffer.getCount(); i++) {
-                                    Achievement achievement = achievementsBuffer.get(i);
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        AchievementBuffer achievementsBuffer = Objects.requireNonNull(task.getResult()).get();
+                        if (achievementsBuffer != null) {
+                            Log.d(TAG, "onConnected(): Achievement count = " + Integer.toString(achievementsBuffer.getCount()));
+                            List<Achievement> achievements = new ArrayList<>();
+                            int achievementCount = 0;
+                            for (int i = 0; i < achievementsBuffer.getCount(); i++) {
+                                Achievement achievement = achievementsBuffer.get(i);
 
-                                    achievements.add(achievement);
+                                achievements.add(achievement);
 
-                                    if (achievement.getState() == Achievement.STATE_UNLOCKED) {
-                                        achievementCount++;
-                                    }
+                                if (achievement.getState() == Achievement.STATE_UNLOCKED) {
+                                    achievementCount++;
                                 }
-                                mTrophiesFragment.setAchievements(achievements);
-                                mMainMenuFragment.setAchievementCount(achievementCount);
                             }
+                            mTrophiesFragment.setAchievements(achievements);
+                            mMainMenuFragment.setAchievementCount(achievementCount);
+                        }
 
-                            if (!signedIn) {
-                                signedIn = true;
-                                setFragmentToContainer(mMainMenuFragment);
-                            }
+                        if (!signedIn) {
+                            signedIn = true;
+                            setFragmentToContainer(mMainMenuFragment);
                         }
                     }
                 });
@@ -375,6 +330,7 @@ public class MainActivity extends FragmentActivity implements
 
     private void onDisconnected() {
         Log.d(TAG, "onDisconnected()");
+        signedIn = false;
 
         mPlayersClient = null;
         mAchievementsClient = null;
@@ -387,7 +343,6 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onStartGameRequested() {
-        //TODO: Pull which of the 3 items we want the user to be able to choose from.
         Log.d(TAG, "onStartGameRequested(): Sign out requested.");
 
         ArrayList<Item> threeItems = new ArrayList<>();
@@ -413,7 +368,7 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onShowLeaderboardRequested() {
-        Games.getLeaderboardsClient(this, GoogleSignIn.getLastSignedInAccount(this))
+        Games.getLeaderboardsClient(this, Objects.requireNonNull(GoogleSignIn.getLastSignedInAccount(this)))
                 .getLeaderboardIntent(getString(R.string.leaderboard_scores))
                 .addOnSuccessListener(intent -> startActivityForResult(intent, REQUEST_CODE_LEADERBOARD));
     }
@@ -422,15 +377,13 @@ public class MainActivity extends FragmentActivity implements
     public void onShowSettingsRequested() {
         Log.d(TAG, "onShowSettingsRequested(): Sign out requested.");
 
-        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "onShowSettingsRequested(): Sign out successful.");
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "onShowSettingsRequested(): Sign out successful.");
 
-                    Toast.makeText(getBaseContext(), "Log out successful.", Toast.LENGTH_LONG).show();
-                    onDisconnected();
-                }
+                //TODO: After logout send the user to the splash screen and request a login.
+                Toast.makeText(getBaseContext(), "Log out successful.", Toast.LENGTH_LONG).show();
+                onDisconnected();
             }
         });
     }
@@ -452,13 +405,13 @@ public class MainActivity extends FragmentActivity implements
         final String fragmentTag = fragment.getClass().getSimpleName();
 
 
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.fragment_container, fragment);
-            if (!(fragment instanceof MainMenuFragment) && !(fragment instanceof SplashScreenFragment)) {
-                transaction.addToBackStack(fragmentTag);
-            }
-            transaction.commit();
-        
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        if (!(fragment instanceof MainMenuFragment) && !(fragment instanceof SplashScreenFragment)) {
+            transaction.addToBackStack(fragmentTag);
+        }
+        transaction.commit();
+
 
     }
 
@@ -547,11 +500,10 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void callCloudVision(final Bitmap bitmap) {
-        // TODO:: Make some sort of loading text.
         // Do the real work in an async task, because we need to use the network anyway
         try {
-            Log.d(TAG,"callCloudVision");
-            AsyncTask<Object, Void, Boolean> labelDetectionTask = new LableDetectionTask(this, prepareAnnotationRequest(bitmap));
+            Log.d(TAG, "callCloudVision");
+            AsyncTask<Object, Void, Boolean> labelDetectionTask = new LabelDetectionTask(this, prepareAnnotationRequest(bitmap));
             labelDetectionTask.execute();
         } catch (IOException e) {
             Log.d(TAG, "failed to make API request because of other IOException " +
@@ -588,13 +540,13 @@ public class MainActivity extends FragmentActivity implements
         pushAccomplishments();
     }
 
-    public static class LableDetectionTask extends AsyncTask<Object, Void, Boolean>  {
+    public static class LabelDetectionTask extends AsyncTask<Object, Void, Boolean> {
 
         private final WeakReference<MainActivity> mActivityWeakReference;
 
         private Vision.Images.Annotate mRequest;
 
-        LableDetectionTask(MainActivity activity, Vision.Images.Annotate annotate) {
+        LabelDetectionTask(MainActivity activity, Vision.Images.Annotate annotate) {
             mActivityWeakReference = new WeakReference<>(activity);
             mRequest = annotate;
         }
@@ -617,7 +569,7 @@ public class MainActivity extends FragmentActivity implements
         protected void onPostExecute(Boolean result) {
             MainActivity activity = mActivityWeakReference.get();
             if (activity != null && !activity.isFinishing()) {
-                Log.d(TAG,result.toString());
+                Log.d(TAG, result.toString());
 
                 activity.onGameFinished(result, selectItem.getDifficulty().ordinal() + 1);
             }

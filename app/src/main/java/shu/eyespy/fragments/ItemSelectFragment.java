@@ -9,12 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import shu.eyespy.Item;
 import shu.eyespy.R;
-
 
 public class ItemSelectFragment extends Fragment implements View.OnClickListener {
 

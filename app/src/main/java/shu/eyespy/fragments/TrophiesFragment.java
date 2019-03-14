@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,10 +22,7 @@ import java.util.List;
 
 import shu.eyespy.R;
 
-
 public class TrophiesFragment extends BaseFragment implements AdapterView.OnItemClickListener {
-
-    private static final String TAG = TrophiesFragment.class.getSimpleName();
 
     private Toast mAchievementToast;
     private View mView;
@@ -60,7 +56,6 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         mTrophiesGridView = mView.findViewById(R.id.trophies_grid_view);
         mTrophiesGridView.setVerticalScrollBarEnabled(false);
 
-        //TODO: Create a listener to handle the button click in main activity.
         mTrophiesGridView.setOnItemClickListener(this);
 
         updateUI();
@@ -70,9 +65,9 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.achievement_toast, (ViewGroup) view.findViewById(R.id.achievement_toast_root));
+        View layout = inflater.inflate(R.layout.achievement_toast, view.findViewById(R.id.achievement_toast_root));
 
-        String title = "???", description = "???";
+        String title = getString(R.string.trophies_unknown), description = getString(R.string.trophies_unknown);
         Achievement achievement = mTrophies.getAchievement(position);
         if (achievement.getState() == Achievement.STATE_REVEALED
                 || achievement.getState() == Achievement.STATE_UNLOCKED) {
@@ -121,7 +116,7 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         private Context mContext;
         private List<Achievement> mAchievements;
 
-        public Trophies() {
+        Trophies() {
             mAchievements = new ArrayList<>();
         }
 
@@ -137,7 +132,6 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
             return null;
         }
 
-        //TODO: Look into this as it does not read right.
         public long getItemId(int position) {
             return 0;
         }
