@@ -63,6 +63,9 @@ import shu.eyespy.utilities.PackageManagerUtils;
 
 public class MainActivity extends FragmentActivity implements
         MainMenuFragment.Listener,
+        ItemSelectFragment.Listener,
+        TrophiesFragment.Listener,
+        ResultFragment.Listener,
         ItemSelectFragment.ItemSelectedCallback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -156,6 +159,9 @@ public class MainActivity extends FragmentActivity implements
         mResultFragment = new ResultFragment();
 
         mMainMenuFragment.setListener(this);
+        mItemSelectFragment.setListener(this);
+        mTrophiesFragment.setListener(this);
+        mResultFragment.setListener(this);
         mItemSelectFragment.setSelectedItemCallback(this);
 
         mItemDatabaseHelper = new ItemAdapter(this);
@@ -397,6 +403,10 @@ public class MainActivity extends FragmentActivity implements
         Intent intent = new Intent(this, CameraActivity.class);
         intent.putExtra("item", selectedItem);
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
+    }
+
+    public void OnHomeButton(){
+        setFragmentToContainer(mMainMenuFragment);
     }
 
 

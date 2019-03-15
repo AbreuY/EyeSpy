@@ -22,6 +22,8 @@ public class ResultFragment extends Fragment {
     private View mView;
     private ImageView mImageView;
     private TextView mStatusTextView;
+    private Listener mListener = null;
+
 
     public void updateResultScreen(boolean result, int score) {
         mView.findViewById(R.id.result_progress_layout).setVisibility(View.GONE);
@@ -35,6 +37,18 @@ public class ResultFragment extends Fragment {
 
     private Bitmap bitmap;
     private String status;
+
+    public void setListener(Listener listener) {
+        mListener = listener;
+    }
+
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.trophies_header:
+                mListener.OnHomeButton();
+                break;
+        }
+    }
 
     public static Bitmap RotateBitmap(Bitmap source, float angle)
     {
@@ -63,6 +77,8 @@ public class ResultFragment extends Fragment {
         mImageView = mView.findViewById(R.id.result_image_taken);
         mStatusTextView = mView.findViewById(R.id.result_status_text_view);
 
+        mView.findViewById(R.id.results_back_button).setOnClickListener(this::onClick);
+
         updateUI();
 
         return mView;
@@ -75,5 +91,9 @@ public class ResultFragment extends Fragment {
 
         mImageView.setImageBitmap(bitmap);
         mStatusTextView.setText(status);
+    }
+
+    public interface Listener {
+        void OnHomeButton();
     }
 }

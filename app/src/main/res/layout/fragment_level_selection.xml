@@ -25,15 +25,25 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageButton
+            <LinearLayout
                 android:id="@+id/level_select_back_button"
-                android:layout_width="50dp"
+                android:layout_width="70dp"
                 android:layout_height="100dp"
                 android:background="@drawable/header_button_template"
                 android:contentDescription="@string/home_button"
-                android:src="@drawable/common_full_open_on_phone"
+                android:src="@drawable/home"
                 android:textColor="#FFFF"
-                android:textSize="40sp" />
+                android:textSize="40sp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:contentDescription="Home Button"
+                    android:textAlignment="center"
+                    android:src="@drawable/home" />
+
+            </LinearLayout>
         </android.support.v7.widget.LinearLayoutCompat>
 
         <android.support.v7.widget.LinearLayoutCompat

@@ -29,6 +29,8 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
     private GridView mTrophiesGridView;
     private Trophies mTrophies;
 
+    private Listener mListener = null;
+
     public TrophiesFragment() {
         this.mTrophies = new Trophies();
     }
@@ -37,6 +39,18 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         this.mTrophies.setAchievements(achievements);
 
         updateUI();
+    }
+
+    public void setListener(Listener listener) {
+        mListener = listener;
+    }
+
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.trophies_back_button:
+                mListener.OnHomeButton();
+                break;
+        }
     }
 
     private void updateUI() {
@@ -57,6 +71,7 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         mTrophiesGridView.setVerticalScrollBarEnabled(false);
 
         mTrophiesGridView.setOnItemClickListener(this);
+        mView.findViewById(R.id.trophies_back_button).setOnClickListener(this::onClick);
 
         updateUI();
         return mView;
@@ -106,6 +121,9 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         return false;
     }
 
+    public interface Listener {
+        void OnHomeButton();
+    }
 
     class Trophies extends BaseAdapter {
 
@@ -165,5 +183,4 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         }
 
     }
-
 }

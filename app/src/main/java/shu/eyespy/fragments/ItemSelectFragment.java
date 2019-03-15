@@ -24,6 +24,8 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
     private TextView mLevelSelectHardTextView;
 
     private ItemSelectedCallback itemSelectedListener;
+    private Listener mListener = null;
+
 
     @Override
     public void onClick(View v) {
@@ -37,6 +39,8 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
             case R.id.level_select_hard_button:
                 itemSelectedListener.onItemSelected(items.get(2));
                 break;
+            case R.id.level_select_back_button:
+                mListener.OnHomeButton();
         }
     }
 
@@ -46,6 +50,10 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
         if (mView != null) {
             updateUI();
         }
+    }
+
+    public void setListener(Listener listener) {
+        mListener = listener;
     }
 
     public void updateUI() {
@@ -78,6 +86,7 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
             mView.findViewById(clickableId).setOnClickListener(this);
         }
 
+        mView.findViewById(R.id.level_select_back_button).setOnClickListener(this::onClick);
         updateUI();
 
         return mView;
@@ -85,5 +94,9 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
 
     public interface ItemSelectedCallback {
         void onItemSelected(Item selectedItem);
+    }
+
+    public interface Listener {
+        void OnHomeButton();
     }
 }

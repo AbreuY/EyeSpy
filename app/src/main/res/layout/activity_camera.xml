@@ -52,10 +52,10 @@
             android:gravity="center">
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="This is a button of a camera to take photos with."
-                android:src="@drawable/camera" />
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="This is a button of a camera to take photos with."
+            android:src="@drawable/camera" />
         </LinearLayout>
 
     </FrameLayout>
