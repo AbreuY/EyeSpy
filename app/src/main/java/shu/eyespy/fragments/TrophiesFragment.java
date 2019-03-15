@@ -20,16 +20,17 @@ import com.google.android.gms.games.achievement.Achievement;
 import java.util.ArrayList;
 import java.util.List;
 
+import shu.eyespy.OnHomeButtonListener;
 import shu.eyespy.R;
 
-public class TrophiesFragment extends BaseFragment implements AdapterView.OnItemClickListener {
+public class TrophiesFragment extends BaseFragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private Toast mAchievementToast;
     private View mView;
     private GridView mTrophiesGridView;
     private Trophies mTrophies;
 
-    private Listener mListener = null;
+    private OnHomeButtonListener mListener = null;
 
     public TrophiesFragment() {
         this.mTrophies = new Trophies();
@@ -41,14 +42,14 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         updateUI();
     }
 
-    public void setListener(Listener listener) {
+    public void setOnHomeButtonListener(OnHomeButtonListener listener) {
         mListener = listener;
     }
 
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.trophies_back_button:
-                mListener.OnHomeButton();
+                mListener.onHomePressed();
                 break;
         }
     }
@@ -71,7 +72,7 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
         mTrophiesGridView.setVerticalScrollBarEnabled(false);
 
         mTrophiesGridView.setOnItemClickListener(this);
-        mView.findViewById(R.id.trophies_back_button).setOnClickListener(this::onClick);
+        mView.findViewById(R.id.trophies_back_button).setOnClickListener(this);
 
         updateUI();
         return mView;
@@ -119,10 +120,6 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
             return true;
         }
         return false;
-    }
-
-    public interface Listener {
-        void OnHomeButton();
     }
 
     class Trophies extends BaseAdapter {

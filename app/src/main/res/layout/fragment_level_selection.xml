@@ -16,10 +16,6 @@
         android:layout_marginEnd="30dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/level_select_easy_button"
-        android:background="@drawable/header_button_template"
-        android:text="@string/level_select_select_item"
-        android:textColor="#FFFF"
-        android:textSize="40sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -43,7 +39,7 @@
                 <ImageView
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:contentDescription="Home Button"
+                    android:contentDescription="@string/home_button"
                     android:textAlignment="center"
                     android:src="@drawable/home" />
 
@@ -61,7 +57,7 @@
                 android:layout_height="100dp"
                 android:layout_marginStart="10dp"
                 android:background="@drawable/header_button_template"
-                android:text="pick one"
+                android:text="@string/level_select_select_item"
                 android:textColor="#FFFF"
                 android:textSize="40sp" />
         </android.support.v7.widget.LinearLayoutCompat>

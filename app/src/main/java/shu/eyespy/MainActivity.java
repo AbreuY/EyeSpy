@@ -63,9 +63,7 @@ import shu.eyespy.utilities.PackageManagerUtils;
 
 public class MainActivity extends FragmentActivity implements
         MainMenuFragment.Listener,
-        ItemSelectFragment.Listener,
-        TrophiesFragment.Listener,
-        ResultFragment.Listener,
+        OnHomeButtonListener,
         ItemSelectFragment.ItemSelectedCallback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -91,6 +89,8 @@ public class MainActivity extends FragmentActivity implements
 
     private final AccomplishmentsOutbox mOutbox = new AccomplishmentsOutbox();
     private static ItemAdapter mItemDatabaseHelper;
+
+    private OnHomeButtonListener mHomeButtonListener;
 
     private long playerScore = 0;
     private boolean signedIn = false;
@@ -159,9 +159,9 @@ public class MainActivity extends FragmentActivity implements
         mResultFragment = new ResultFragment();
 
         mMainMenuFragment.setListener(this);
-        mItemSelectFragment.setListener(this);
-        mTrophiesFragment.setListener(this);
-        mResultFragment.setListener(this);
+        mItemSelectFragment.setOnHomeButtonListener(this);
+        mTrophiesFragment.setOnHomeButtonListener(this);
+        mResultFragment.setOnHomeButtonListener(this);
         mItemSelectFragment.setSelectedItemCallback(this);
 
         mItemDatabaseHelper = new ItemAdapter(this);
@@ -405,7 +405,7 @@ public class MainActivity extends FragmentActivity implements
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
 
-    public void OnHomeButton(){
+    public void onHomePressed(){
         setFragmentToContainer(mMainMenuFragment);
     }
 

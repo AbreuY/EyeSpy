@@ -14,15 +14,16 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
+import shu.eyespy.OnHomeButtonListener;
 import shu.eyespy.R;
 
 //TODO: Change to BaseFragment and don't allow back space.
-public class ResultFragment extends Fragment {
+public class ResultFragment extends Fragment implements View.OnClickListener{
 
     private View mView;
     private ImageView mImageView;
     private TextView mStatusTextView;
-    private Listener mListener = null;
+    private OnHomeButtonListener mListener = null;
 
 
     public void updateResultScreen(boolean result, int score) {
@@ -38,14 +39,14 @@ public class ResultFragment extends Fragment {
     private Bitmap bitmap;
     private String status;
 
-    public void setListener(Listener listener) {
+    public void setOnHomeButtonListener(OnHomeButtonListener listener) {
         mListener = listener;
     }
 
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.trophies_header:
-                mListener.OnHomeButton();
+            case R.id.results_back_button:
+                mListener.onHomePressed();
                 break;
         }
     }
@@ -77,7 +78,7 @@ public class ResultFragment extends Fragment {
         mImageView = mView.findViewById(R.id.result_image_taken);
         mStatusTextView = mView.findViewById(R.id.result_status_text_view);
 
-        mView.findViewById(R.id.results_back_button).setOnClickListener(this::onClick);
+        mView.findViewById(R.id.results_back_button).setOnClickListener(this);
 
         updateUI();
 
@@ -91,9 +92,5 @@ public class ResultFragment extends Fragment {
 
         mImageView.setImageBitmap(bitmap);
         mStatusTextView.setText(status);
-    }
-
-    public interface Listener {
-        void OnHomeButton();
     }
 }

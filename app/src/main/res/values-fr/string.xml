@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- HOME BUTTON -->
+    <string name="home_button">Bouton d\'accueil</string>
+
     <!-- MAIN MENU -->
     <string name="main_menu_options_button">Se déconnecter</string>
     <string name="main_menu_rankings_button">CLASSEMENT</string>

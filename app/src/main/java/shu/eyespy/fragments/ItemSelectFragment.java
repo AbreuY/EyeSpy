@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import shu.eyespy.Item;
+import shu.eyespy.OnHomeButtonListener;
 import shu.eyespy.R;
 
 public class ItemSelectFragment extends Fragment implements View.OnClickListener {
@@ -25,7 +26,7 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
     private TextView mLevelSelectHardTextView;
 
     private ItemSelectedCallback itemSelectedListener;
-    private Listener mListener = null;
+    private OnHomeButtonListener mListener = null;
 
 
     @Override
@@ -41,8 +42,12 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
                 itemSelectedListener.onItemSelected(items.get(2));
                 break;
             case R.id.level_select_back_button:
-                mListener.OnHomeButton();
+                mListener.onHomePressed();
         }
+    }
+
+    public void setOnHomeButtonListener(OnHomeButtonListener listener) {
+        mListener = listener;
     }
 
     public void setItems(ArrayList<Item> items) {
@@ -51,10 +56,6 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
         if (mView != null) {
             updateUI();
         }
-    }
-
-    public void setListener(Listener listener) {
-        mListener = listener;
     }
 
     public void updateUI() {
@@ -89,7 +90,7 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
             mView.findViewById(clickableId).setOnClickListener(this);
         }
 
-        mView.findViewById(R.id.level_select_back_button).setOnClickListener(this::onClick);
+        mView.findViewById(R.id.level_select_back_button).setOnClickListener(this);
         updateUI();
 
         return mView;
@@ -97,9 +98,5 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
 
     public interface ItemSelectedCallback {
         void onItemSelected(Item selectedItem);
-    }
-
-    public interface Listener {
-        void OnHomeButton();
     }
 }
