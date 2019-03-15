@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import shu.eyespy.Item;
 import shu.eyespy.R;
@@ -57,9 +58,11 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
     }
 
     public void updateUI() {
-        mLevelSelectEasyTextView.setText(items.get(0).getName());
-        mLevelSelectMediumTextView.setText(items.get(1).getName());
-        mLevelSelectHardTextView.setText(items.get(2).getName());
+        final String localeInfo = Locale.getDefault().getCountry();
+
+        mLevelSelectEasyTextView.setText(items.get(0).getName(localeInfo));
+        mLevelSelectMediumTextView.setText(items.get(1).getName(localeInfo));
+        mLevelSelectHardTextView.setText(items.get(2).getName(localeInfo));
     }
 
 

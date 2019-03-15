@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MAIN MENU -->
+    <string name="main_menu_options_button">Se déconnecter</string>
+    <string name="main_menu_rankings_button">CLASSEMENT</string>
+    <string name="main_menu_trophies_button">TROPHEES</string>
+    <string name="main_menu_play_button">JOUER</string>
+
+    <!-- SPLASH SCREEN -->
+    <string name="splash_screen_attempting_sign_in">Tentative de connexion…</string>
+    <string name="splash_screen_error_signing_in">Erreur de connexion: %s</string>
+    <string name="splash_screen_retrieving_player_info">Récupération des informations sur les joueurs…</string>
+
+    <!-- LEVEL SELECT -->
+    <string name="level_select_select_item">SÉLECTIONNER UN ARTICLE</string>
+    <string name="level_select_easy_difficulty">Difficulté facile</string>
+    <string name="level_select_medium_difficulty">Difficulté moyenne</string>
+    <string name="level_select_hard_difficulty">Difficulté difficile</string>
+
+    <!-- RESULT FRAGMENT -->
+    <string name="result_main_menu">MENU PRINCIPAL</string>
+    <string name="result_correct_answer">Félicitations, votre score a augmenté de %d.</string>
+    <string name="result_wrong_item">Désolé, l\'article n\'a pas été trouvé dans l\'image.</string>
+    <string name="results_title">Résultats</string>
+    <string name="result_image_taken">Ceci est l\'image qui a été prise</string>
+    <string name="result_searching">Recherche d\'objet…</string>
+
+    <!-- CONTENT DESCRIPTIONS -->
+    <string name="players_avatar_content_desc">Cela contient l\'image pour les joueurs avatar.</string>
+    <string name="achievement_toast_trophy_description">Le toast du trophée indiqué.</string>
+    <string name="camera_button_description">Il s\'agit d\'un bouton d\'une caméra permettant de prendre des photos </string>
+
+    <!-- PERMISSIONS REASONING -->
+    <string name="request_camera_permission">Cette application nécessite l\'autorisation de la caméra.</string>
+
+    <!-- API ISSUES -->
+    <string name="camera_error">Cet appareil ne supporte pas Camera2 API.</string>
+</resources>

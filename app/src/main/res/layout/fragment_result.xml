@@ -17,6 +17,10 @@
         android:layout_marginEnd="30dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/result_image_layout"
+        android:background="@drawable/header_button_template"
+        android:text="@string/results_title"
+        android:textColor="#FFFF"
+        android:textSize="40sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -78,7 +82,8 @@
             android:layout_height="400dp"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
-            android:adjustViewBounds="true" />
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/result_image_taken" />
 
         <LinearLayout
             android:id="@+id/result_progress_layout"
@@ -135,7 +140,7 @@
                 android:layout_width="300dp"
                 android:layout_height="80dp"
                 android:layout_marginTop="20dp"
-                android:text="MAIN MENU"
+                android:text="@string/result_main_menu"
                 android:background="@drawable/curved_button_template"
                 android:textColor="#FFFF"
                 android:textSize="32sp"
