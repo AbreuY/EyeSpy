@@ -3,6 +3,7 @@ package shu.eyespy;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -89,6 +90,8 @@ public class MainActivity extends FragmentActivity implements
     private final AccomplishmentsOutbox mOutbox = new AccomplishmentsOutbox();
     private static ItemAdapter mItemDatabaseHelper;
 
+    private SoundManager mSoundManager;
+
     private long playerScore = 0;
     private boolean signedIn = false;
 
@@ -160,8 +163,10 @@ public class MainActivity extends FragmentActivity implements
 
         mItemDatabaseHelper = new ItemAdapter(this);
 
-        setFragmentToContainer(mSplashScreenFragment);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        mSoundManager = new SoundManager(this);
 
+        setFragmentToContainer(mSplashScreenFragment);
     }
 
     @Override
@@ -198,6 +203,8 @@ public class MainActivity extends FragmentActivity implements
         // State of signed in user could change when changing from another app,
         // try and sign in again when the app resumes.
         signInSilently();
+
+        mSoundManager.resumeBgMusic();
     }
 
     // Returns whether the user is currently signed into a Google account.
@@ -352,6 +359,12 @@ public class MainActivity extends FragmentActivity implements
         mItemSelectFragment.setItems(threeItems);
 
         setFragmentToContainer(mItemSelectFragment);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSoundManager.pauseBgMusic();
     }
 
     @Override
@@ -528,6 +541,7 @@ public class MainActivity extends FragmentActivity implements
 
     public void onGameFinished(boolean success, int score) {
         mResultFragment.updateResultScreen(success, score);
+        mSoundManager.playSoundForGameEvent(success ? SoundManager.SoundEvent.GameWon : SoundManager.SoundEvent.GameLost);
 
         mOutbox.mGamesPlayed++;
         if (success) {

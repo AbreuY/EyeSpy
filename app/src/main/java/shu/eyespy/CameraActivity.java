@@ -61,7 +61,7 @@ public class CameraActivity extends AppCompatActivity
         implements View.OnClickListener {
 
     private static final String TAG = CameraActivity.class.getSimpleName();
-
+    private SoundManager mSoundManager;
     /**
      * Conversion from screen rotation to JPEG orientation.
      */
@@ -820,6 +820,7 @@ public class CameraActivity extends AppCompatActivity
         switch (view.getId()) {
             case R.id.takePicture: {
                 takePicture();
+                mSoundManager.playSoundForGameEvent(SoundManager.SoundEvent.PictureTaken);
                 break;
             }
         }
@@ -846,6 +847,7 @@ public class CameraActivity extends AppCompatActivity
 
         mItemTextView.setText(selectedItem.getName(Locale.getDefault().getCountry()));
 
+        mSoundManager = new SoundManager(this);
         mFile = new File(this.getExternalFilesDir(null), "pic.jpg");
     }
 
