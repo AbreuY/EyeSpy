@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name" translatable="false">EyeSpy</string>
 
+    <!-- HOME BUTTON -->
+    <string name="home_button">Home Button</string>
+
     <!-- MAIN MENU -->
     <string name="main_menu_options_button">LOG OUT</string>
     <string name="main_menu_rankings_button">RANKINGS</string>

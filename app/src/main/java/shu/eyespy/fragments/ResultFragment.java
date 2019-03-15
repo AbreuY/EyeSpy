@@ -14,14 +14,17 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
+import shu.eyespy.OnHomeButtonListener;
 import shu.eyespy.R;
 
 //TODO: Change to BaseFragment and don't allow back space.
-public class ResultFragment extends Fragment {
+public class ResultFragment extends Fragment implements View.OnClickListener{
 
     private View mView;
     private ImageView mImageView;
     private TextView mStatusTextView;
+    private OnHomeButtonListener mListener = null;
+
 
     public void updateResultScreen(boolean result, int score) {
         mView.findViewById(R.id.result_progress_layout).setVisibility(View.GONE);
@@ -35,6 +38,18 @@ public class ResultFragment extends Fragment {
 
     private Bitmap bitmap;
     private String status;
+
+    public void setOnHomeButtonListener(OnHomeButtonListener listener) {
+        mListener = listener;
+    }
+
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.results_back_button:
+                mListener.onHomePressed();
+                break;
+        }
+    }
 
     public static Bitmap RotateBitmap(Bitmap source, float angle)
     {
@@ -62,6 +77,8 @@ public class ResultFragment extends Fragment {
 
         mImageView = mView.findViewById(R.id.result_image_taken);
         mStatusTextView = mView.findViewById(R.id.result_status_text_view);
+
+        mView.findViewById(R.id.results_back_button).setOnClickListener(this);
 
         updateUI();
 
