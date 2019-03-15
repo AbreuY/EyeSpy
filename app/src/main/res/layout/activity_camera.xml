@@ -54,7 +54,7 @@
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:contentDescription="This is a button of a camera to take photos with."
+                android:contentDescription="@string/camera_button_description"
                 android:src="@drawable/camera" />
         </LinearLayout>
 

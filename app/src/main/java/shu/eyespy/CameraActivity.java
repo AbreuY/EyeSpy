@@ -51,6 +51,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -843,7 +844,7 @@ public class CameraActivity extends AppCompatActivity
 
         findViewById(R.id.takePicture).setOnClickListener(this);
 
-        mItemTextView.setText(selectedItem.getName());
+        mItemTextView.setText(selectedItem.getName(Locale.getDefault().getCountry()));
 
         mFile = new File(this.getExternalFilesDir(null), "pic.jpg");
     }

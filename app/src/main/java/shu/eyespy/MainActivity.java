@@ -113,7 +113,7 @@ public class MainActivity extends FragmentActivity implements
             for (EntityAnnotation label : labels) {
                 String item = label.getDescription();
 
-                if (selectItem.getName().compareToIgnoreCase(item) == 0
+                if (selectItem.getNameEn().compareToIgnoreCase(item) == 0
                         || selectItem.getSynonyms().contains(item)) {
                     return true;
                 }
@@ -342,7 +342,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onStartGameRequested() {
+    public void onStartGameRequested() throws Exception {
         Log.d(TAG, "onStartGameRequested(): Sign out requested.");
 
         ArrayList<Item> threeItems = new ArrayList<>();
@@ -425,7 +425,7 @@ public class MainActivity extends FragmentActivity implements
                         );
 
                 mResultFragment.setImage(bitmap);
-                mResultFragment.setStatus("Searching for item...");
+                mResultFragment.setStatus(getString(R.string.result_searching));
                 setFragmentToContainer(mResultFragment);
                 callCloudVision(bitmap);
             } catch (IOException e) {
