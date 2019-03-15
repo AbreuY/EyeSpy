@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">EyeSpy</string>
 
+    <string name="home_button">Home Button</string>
+
     <!-- MAIN MENU -->
     <string name="main_menu_options_button">OPTIONS</string>
     <string name="main_menu_rankings_button">RANKINGS</string>
