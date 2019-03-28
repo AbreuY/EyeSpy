@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import shu.eyespy.Item;
+import shu.eyespy.OnHomeButtonListener;
 import shu.eyespy.R;
 
 public class ItemSelectFragment extends Fragment implements View.OnClickListener {
@@ -25,6 +26,8 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
     private TextView mLevelSelectHardTextView;
 
     private ItemSelectedCallback itemSelectedListener;
+    private OnHomeButtonListener mListener = null;
+
 
     @Override
     public void onClick(View v) {
@@ -38,7 +41,13 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
             case R.id.level_select_hard_button:
                 itemSelectedListener.onItemSelected(items.get(2));
                 break;
+            case R.id.level_select_back_button:
+                mListener.onHomePressed();
         }
+    }
+
+    public void setOnHomeButtonListener(OnHomeButtonListener listener) {
+        mListener = listener;
     }
 
     public void setItems(ArrayList<Item> items) {
@@ -81,6 +90,7 @@ public class ItemSelectFragment extends Fragment implements View.OnClickListener
             mView.findViewById(clickableId).setOnClickListener(this);
         }
 
+        mView.findViewById(R.id.level_select_back_button).setOnClickListener(this);
         updateUI();
 
         return mView;

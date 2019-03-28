@@ -5,41 +5,79 @@
     android:layout_height="match_parent"
     android:background="#1DADA7">
 
-    <Button
-        android:id="@+id/button4"
+    <LinearLayout
+        android:id="@+id/trophies_top_bar"
+        android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="55dp"
+        android:layout_marginStart="30dp"
         android:layout_marginTop="25dp"
-        android:layout_marginEnd="56dp"
-        android:layout_marginBottom="25dp"
-        android:background="@drawable/header_button_template"
-        android:text="@string/main_menu_trophies_button"
-        android:textColor="#FFFF"
-        android:textSize="40sp"
+        android:layout_marginEnd="30dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/trophies_grid_view"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <android.support.v7.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/trophies_back_button"
+                android:layout_width="70dp"
+                android:layout_height="100dp"
+                android:background="@drawable/header_button_template"
+                android:contentDescription="@string/home_button"
+                android:src="@drawable/home"
+                android:textColor="#FFFF"
+                android:textSize="40sp"
+                android:gravity="center">
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="@string/home_button"
+                android:textAlignment="center"
+                android:src="@drawable/home" />
+
+            </LinearLayout>
+        </android.support.v7.widget.LinearLayoutCompat>
+
+        <android.support.v7.widget.LinearLayoutCompat
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/trophies_header"
+                android:layout_width="fill_parent"
+                android:layout_height="100dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/header_button_template"
+                android:text="@string/main_menu_trophies_button"
+                android:textColor="#FFFF"
+                android:textSize="40sp" />
+        </android.support.v7.widget.LinearLayoutCompat>
+    </LinearLayout>
 
     <GridView
         android:id="@+id/trophies_grid_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginEnd="56dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="25dp"
         android:gravity="center"
         android:horizontalSpacing="10dp"
         android:numColumns="3"
+        android:scrollbarAlwaysDrawVerticalTrack="false"
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/trophies_top_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button4"
-        android:scrollbarAlwaysDrawVerticalTrack="false"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
