@@ -46,6 +46,7 @@ public class ResultFragment extends Fragment implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.results_back_button:
+            case R.id.result_menu_button:
                 mListener.onHomePressed();
                 break;
         }
@@ -79,6 +80,7 @@ public class ResultFragment extends Fragment implements View.OnClickListener{
         mStatusTextView = mView.findViewById(R.id.result_status_text_view);
 
         mView.findViewById(R.id.results_back_button).setOnClickListener(this);
+        mView.findViewById(R.id.result_menu_button).setOnClickListener(this);
 
         updateUI();
 

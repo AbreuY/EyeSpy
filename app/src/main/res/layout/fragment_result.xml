@@ -69,6 +69,7 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
+        android:layout_marginTop="32dp"
         android:id="@+id/result_image_layout">
 
 

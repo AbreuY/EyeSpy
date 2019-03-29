@@ -1,7 +1,10 @@
 package shu.eyespy.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,9 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import shu.eyespy.MainActivity;
 import shu.eyespy.R;
+import shu.eyespy.SoundManager;
 
 public class MainMenuFragment extends Fragment implements OnClickListener {
 
@@ -20,6 +26,7 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
     private View mView;
     private String mUsername;
     private Listener mListener = null;
+    private SoundManager mSoundManager;
 
     private TextView mUsernameTextView;
     private TextView mScoreTextView;
@@ -27,6 +34,15 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
 
     private int achievementCount;
     private long score;
+
+    boolean musicActive;
+    boolean soundAcitve;
+
+    public void setSoundManager(SoundManager soundManager) {
+        this.mSoundManager = soundManager;
+
+        updateUI();
+    }
 
     public void setScore(long score) {
         this.score = score;
@@ -52,7 +68,9 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
                 R.id.main_menu_play_button,
                 R.id.main_menu_trophies_button,
                 R.id.main_menu_rankings_button,
-                R.id.main_menu_options_button
+                R.id.main_menu_options_button,
+                R.id.soundImageView,
+                R.id.musicImageView
         };
 
         for (int clickableId : clickableIds) {
@@ -100,6 +118,13 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
                 break;
             case R.id.main_menu_options_button:
                 mListener.onShowSettingsRequested();
+                break;
+            case R.id.musicImageView:
+                mListener.onMusicToggled();
+                break;
+            case R.id.soundImageView:
+                mListener.onSoundToggled();
+                break;
         }
     }
 
@@ -112,6 +137,36 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
         mUsernameTextView.setText(mUsername);
         mScoreTextView.setText(Long.toString(score));
         mAchievementCountTextView.setText(Integer.toString(achievementCount));
+        updateSoundButton(mSoundManager.getSoundStatus());
+        updateMusicButton(mSoundManager.getMusicStatus());
+    }
+
+    public void updateSoundButton(boolean active) {
+        if (mView == null) {
+            return;
+        }
+
+        ImageView soundButton =  mView.findViewById(R.id.soundImageView);
+        if (active) {
+            soundButton.setImageResource(R.drawable.sound_on);
+        }
+        else {
+            soundButton.setImageResource(R.drawable.sound_off);
+        }
+    }
+
+    public void updateMusicButton(boolean active) {
+        if (mView == null) {
+            return;
+        }
+
+        ImageView musicButton =  mView.findViewById(R.id.musicImageView);
+        if (active) {
+            musicButton.setImageResource(R.drawable.music_on);
+        }
+        else {
+            musicButton.setImageResource(R.drawable.music_off);
+        }
     }
 
     public interface Listener {
@@ -124,5 +179,9 @@ public class MainMenuFragment extends Fragment implements OnClickListener {
         void onShowLeaderboardRequested();
 
         void onShowSettingsRequested();
+
+        void onSoundToggled();
+
+        void onMusicToggled();
     }
 }

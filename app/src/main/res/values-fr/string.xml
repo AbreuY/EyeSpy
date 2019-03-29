@@ -33,6 +33,8 @@
     <string name="players_avatar_content_desc">Cela contient l\'image pour les joueurs avatar.</string>
     <string name="achievement_toast_trophy_description">Le toast du trophée indiqué.</string>
     <string name="camera_button_description">Il s\'agit d\'un bouton d\'une caméra permettant de prendre des photos </string>
+    <string name="score_count_desc">Score compte</string>
+    <string name="trophies_count_desc">Les trophées comptent</string>
 
     <!-- PERMISSIONS REASONING -->
     <string name="request_camera_permission">Cette application nécessite l\'autorisation de la caméra.</string>

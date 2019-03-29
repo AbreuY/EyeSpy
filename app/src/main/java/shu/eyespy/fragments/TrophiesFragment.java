@@ -49,6 +49,7 @@ public class TrophiesFragment extends BaseFragment implements AdapterView.OnItem
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.trophies_back_button:
+                this.onBackPressed();
                 mListener.onHomePressed();
                 break;
         }

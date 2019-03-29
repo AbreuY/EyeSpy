@@ -170,6 +170,8 @@ public class MainActivity extends FragmentActivity implements
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         mSoundManager = new SoundManager(this);
+        mMainMenuFragment.setSoundManager(mSoundManager);
+
 
         setFragmentToContainer(mSplashScreenFragment);
     }
@@ -404,6 +406,18 @@ public class MainActivity extends FragmentActivity implements
                 onDisconnected();
             }
         });
+    }
+
+    @Override
+    public void onSoundToggled() {
+        mSoundManager.toggleSoundStatus();
+        mMainMenuFragment.updateSoundButton(mSoundManager.getSoundStatus());
+    }
+
+    @Override
+    public void onMusicToggled() {
+        mSoundManager.toggleMusicStatus();
+        mMainMenuFragment.updateMusicButton(mSoundManager.getMusicStatus());
     }
 
     private static Item selectItem;
